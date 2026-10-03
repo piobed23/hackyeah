@@ -1,25 +1,62 @@
 @using App.Models
-@model AiSuggestion?
+@using App.Infrastructure.Enums
+@model (AiSuggestion? Sugestia, IReadOnlyList<SimilarityResult> Inspiracje, bool UzywaEmbeddingow)
 <aside class="card bg-light border-0 shadow-sm" aria-labelledby="aiTitle" aria-live="polite">
     <div class="card-body">
         <h2 id="aiTitle" class="h6 text-primary">
             <span aria-hidden="true">🤖</span> Asystent AI
+            @if (Model.UzywaEmbeddingow)
+            {
+                <span class="badge bg-primary ms-1" title="Wyszukiwanie semantyczne z lokalnym modelem embeddingów (multilingual-e5-small). Działa offline, bez chmury.">semantic</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary ms-1" title="Działa fallback tokenowy — bez modelu embeddingów.">tokeny</span>
+            }
         </h2>
-        @if (Model is null || Model.Punkty.Count == 0)
+
+        @if (Model.Inspiracje.Count > 0)
         {
-            <p class="text-muted small mb-0">Uzupełnij pole, a asystent zaproponuje doprecyzowanie.</p>
+            <h3 class="h6 small text-muted text-uppercase mt-2 mb-1">Zobacz, jak inni to zrobili</h3>
+            <ul class="list-unstyled small mb-3">
+                @foreach (var i in Model.Inspiracje)
+                {
+                    var klasaBadge = i.Etap == EtapInnowacji.SprawdzonaInnowacja ? "bg-success" : "bg-info text-dark";
+                    var etykietaBadge = i.Etap == EtapInnowacji.SprawdzonaInnowacja ? "sprawdzona" : i.Etap.ToString();
+                    <li class="border-start border-2 ps-2 mb-2">
+                        <span class="badge @klasaBadge small">@etykietaBadge</span>
+                        <a asp-page="/Publiczne/Karta" asp-route-id="@i.IdeaId" target="_blank" rel="noopener">
+                            <strong>@i.Tytul</strong>
+                        </a>
+                        <span class="text-muted">· @((int)(i.Wynik * 100))% dopasowania</span>
+                        @if (!string.IsNullOrWhiteSpace(i.Streszczenie))
+                        {
+                            <p class="small mb-0 text-muted">@(i.Streszczenie.Length > 120 ? i.Streszczenie[..120] + "…" : i.Streszczenie)</p>
+                        }
+                    </li>
+                }
+            </ul>
         }
-        else
+
+        @if (Model.Sugestia is not null && Model.Sugestia.Punkty.Count > 0)
         {
-            <p class="small text-muted mb-2">@Model.Preambula</p>
-            <ul class="small ps-3">
-                @foreach (var p in Model.Punkty)
+            <h3 class="h6 small text-muted text-uppercase mb-1">Uwagi</h3>
+            <ul class="small ps-3 mb-2">
+                @foreach (var p in Model.Sugestia.Punkty)
                 {
                     <li class="mb-1">@p</li>
                 }
             </ul>
+        }
+
+        @if ((Model.Sugestia is null || Model.Sugestia.Punkty.Count == 0) && Model.Inspiracje.Count == 0)
+        {
+            <p class="text-muted small mb-0">Zacznij pisać — pokażemy podobne rozwiązania z biblioteki.</p>
+        }
+        else
+        {
             <p class="small text-muted mb-0">
-                Każdą propozycję zatwierdzasz Ty — nic nie jest wklejane automatycznie.
+                Nic nie jest wklejane automatycznie — Ty decydujesz, co wykorzystać.
             </p>
         }
     </div>

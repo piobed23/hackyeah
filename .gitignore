@@ -10,6 +10,18 @@
 *.userosscache
 *.sln.docstates
 
+# ONNX models (duże, pobierane lokalnie — patrz App/wwwroot/models/*/README.md)
+*.onnx
+*.safetensors
+sentencepiece.bpe.model
+tokenizer.json
+
+# Baza SQLite (regenerowana przez seeder przy starcie)
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

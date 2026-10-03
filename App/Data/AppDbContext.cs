@@ -1,11 +1,40 @@
 using App.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace App.Data;
 
 public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        NaprawPusteStringi();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+    public override int SaveChanges()
+    {
+        NaprawPusteStringi();
+        return base.SaveChanges();
+    }
+
+    private void NaprawPusteStringi()
+    {
+        foreach (var entry in ChangeTracker.Entries().Where(e => e.State == EntityState.Added || e.State == EntityState.Modified))
+        {
+            foreach (var prop in entry.Properties)
+            {
+                if (prop.Metadata.ClrType == typeof(string)
+                    && !prop.Metadata.IsNullable
+                    && prop.CurrentValue is null)
+                {
+                    prop.CurrentValue = "";
+                }
+            }
+        }
+    }
 
     public DbSet<User> Users => Set<User>();
     public DbSet<Idea> Ideas => Set<Idea>();

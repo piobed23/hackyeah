@@ -60,13 +60,22 @@ public class MockAiAssistant : IAiAssistant
     {
         tresc ??= "";
         var punkty = new List<string>();
+        var normalized = pole.ToLowerInvariant();
+
+        if (normalized is "tytuł" or "tytul")
+        {
+            if (string.IsNullOrWhiteSpace(tresc))
+                punkty.Add("Spróbuj wzorca: rzecz + dla kogo. Przykłady z historii: 'Teleopieka dla seniorów', 'Mentoring NEET'.");
+            // Dla niepustych tytułów nie pouczam — po prawej panelu pokażę realne podobne tytuły z biblioteki.
+            return Task.FromResult(new AiSuggestion(Preambula, punkty, pole));
+        }
 
         if (tresc.Length < 40)
-            punkty.Add($"Pole '{pole}' wygląda na zbyt krótkie — rozwiń o 2-3 zdania.");
-        if (!tresc.Contains(' '))
+            punkty.Add($"Pole '{pole}' jest zbyt krótkie — rozwiń o 2-3 zdania.");
+        if (!tresc.Contains(' ') && tresc.Length > 0)
             punkty.Add("Zapisz pełnym zdaniem, nie hasłowo — czytelnicy spoza projektu nie zrozumieją kontekstu.");
 
-        switch (pole.ToLowerInvariant())
+        switch (normalized)
         {
             case "problem":
                 punkty.Add("Opisz, kogo problem dotyczy liczbowo (ile osób, w jakim regionie).");
@@ -101,7 +110,7 @@ public class MockAiAssistant : IAiAssistant
         }
 
         if (punkty.Count == 0)
-            punkty.Add($"Zawartość pola '{pole}' wygląda sensownie — rozważ dodanie konkretnego przykładu.");
+            punkty.Add($"Pole '{pole}' wygląda sensownie.");
 
         return Task.FromResult(new AiSuggestion(Preambula, punkty, pole));
     }
