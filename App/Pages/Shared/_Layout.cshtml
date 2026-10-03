@@ -1,9 +1,21 @@
+@using App.Infrastructure.Auth
 @using App.Infrastructure.Enums
 @using App.Services.Context
 @inject IAuthContext Auth
 @{
     var user = Auth.GetUser();
     var rola = Auth.GetRola();
+    var strona = (ViewContext.RouteData.Values["page"] as string) ?? "";
+    bool Akt(string prefiks) => strona.StartsWith(prefiks, StringComparison.OrdinalIgnoreCase);
+    string AktKlasa(string prefiks) => Akt(prefiks) ? " active" : "";
+    string AktAria(string prefiks) => Akt(prefiks) ? "page" : null!;
+    var admin = rola == RolaUzytkownika.Admin;
+    var czyAutor = Uprawnienia.MozeTworzycPomysly(rola);
+    var czyRops = Uprawnienia.PracujeWRops(rola);
+    var czyMieszkaniec = rola == RolaUzytkownika.Mieszkaniec;
+    var czyInstytucja = rola == RolaUzytkownika.Instytucja;
+    var czyEkspert = rola == RolaUzytkownika.Ekspert;
+    var mozeZglaszac = Uprawnienia.MozeZglaszacProblem(rola);
 }
 <!DOCTYPE html>
 <html lang="pl">
@@ -12,70 +24,162 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] — ROPS Innowacje</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
     <a class="visually-hidden-focusable p-2 bg-primary text-white position-absolute top-0 start-0" href="#tresc">Przejdź do treści</a>
 
     <header>
-        <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom shadow-sm mb-3" aria-label="Główna nawigacja">
+        <div class="ws-demo-bar py-1">
             <div class="container">
-                <a class="navbar-brand fw-semibold" asp-page="/Index">ROPS Innowacje</a>
+                <form method="post" asp-page="/Index" asp-page-handler="ZmienRole"
+                      class="d-flex flex-wrap align-items-center justify-content-between gap-2" aria-label="Przełącznik roli demonstracyjnej">
+                    @Html.AntiForgeryToken()
+                    <span class="d-flex align-items-center gap-2">
+                        <i class="bi bi-person-badge" aria-hidden="true"></i>
+                        <span>Tryb demonstracyjny</span>
+                        @if (user is not null)
+                        {
+                            <span class="d-none d-sm-inline" aria-live="polite">· zalogowano jako <strong>@user.Imie @user.Nazwisko</strong></span>
+                        }
+                    </span>
+                    <span class="d-flex align-items-center gap-2">
+                        <label for="rolaDemo" class="mb-0">Rola:</label>
+                        <select id="rolaDemo" name="rola" class="form-select form-select-sm w-auto">
+                            @foreach (var r in Enum.GetValues<RolaUzytkownika>())
+                            {
+                                <option value="@r" selected="@(r == rola)">@r</option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-light">Zmień</button>
+                    </span>
+                </form>
+            </div>
+        </div>
+
+        <nav class="navbar navbar-expand-lg ws-navbar mb-4" aria-label="Główna nawigacja">
+            <div class="container">
+                <a class="navbar-brand ws-brand d-flex align-items-center gap-2" asp-page="/Index">
+                    <span>ROPS <em>Innowacje</em></span>
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navMain" aria-controls="navMain"
                         aria-expanded="false" aria-label="Rozwiń nawigację">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navMain">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item"><a class="nav-link" asp-page="/Index">Start</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-page="/Problemy/Zglos">Zgłoś problem</a></li>
-                        @if (rola == RolaUzytkownika.Autor || rola == RolaUzytkownika.Admin)
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link@(strona == "/Index" ? " active" : "")" asp-page="/Index" aria-current="@(strona == "/Index" ? "page" : null)">Start</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link@(AktKlasa("/Biblioteka"))" asp-page="/Biblioteka/Index" aria-current="@AktAria("/Biblioteka")">Biblioteka</a>
+                        </li>
+                        @if (!czyRops || admin)
                         {
-                            <li class="nav-item"><a class="nav-link" asp-page="/Moje/Index">Moje pomysły</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-page="/Kreator/Rodzaj">Dodaj pomysł</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-page="/Nabory/Index">Nabory</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link@(AktKlasa("/Publiczne"))" asp-page="/Publiczne/DoTestowania" aria-current="@AktAria("/Publiczne")">Innowacje do testowania</a>
+                            </li>
                         }
-                        <li class="nav-item"><a class="nav-link" asp-page="/Publiczne/DoTestowania">Innowacje do testowania</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-page="/Biblioteka/Index">Biblioteka</a></li>
-                        @if (rola == RolaUzytkownika.PracownikROPS || rola == RolaUzytkownika.Admin)
+
+                        @if (czyMieszkaniec)
                         {
-                            <li class="nav-item"><a class="nav-link fw-semibold" asp-page="/Rops/Panel">Panel ROPS</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-page="/Rops/Problemy">Problemy</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-page="/Rops/Biblioteka">Biblioteka</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-page="/Rops/Weryfikacja">Fiszki</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-page="/Rops/Ocena">Wnioski</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-page="/Rops/PodgladTesterow">Testerzy</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link@(AktKlasa("/Problemy/Moje"))" asp-page="/Problemy/Moje" aria-current="@AktAria("/Problemy/Moje")">Moje zgłoszenia</a>
+                            </li>
+                        }
+
+                        @if (czyAutor)
+                        {
+                            <li class="nav-item dropdown">
+                                <button class="nav-link dropdown-toggle@(Akt("/Moje") || Akt("/Kreator") || Akt("/Nabory") || Akt("/Wnioski") || Akt("/Autor") ? " active" : "")"
+                                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-pencil-square" aria-hidden="true"></i> Moje innowacje
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-page="/Moje/Index">Moje pomysły</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Kreator/Rodzaj">Dodaj pomysł</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Nabory/Index">Nabory i wnioski</a></li>
+                                </ul>
+                            </li>
+                        }
+
+                        @if (czyInstytucja)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link@(AktKlasa("/Middleman"))" asp-page="/Middleman/Moje" aria-current="@AktAria("/Middleman")">Wdrożenia</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link@(Akt("/Nabory") || Akt("/Wnioski") ? " active" : "")" asp-page="/Nabory/Index">Nabory i wnioski</a>
+                            </li>
+                        }
+
+                        @if (czyEkspert)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link@(AktKlasa("/Ekspert"))" asp-page="/Ekspert/DoOceny" aria-current="@AktAria("/Ekspert")">Do oceny</a>
+                            </li>
+                        }
+
+                        @if (czyRops)
+                        {
+                            <li class="nav-item dropdown">
+                                <button class="nav-link dropdown-toggle@(Akt("/Rops") ? " active" : "")"
+                                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-speedometer2" aria-hidden="true"></i> Panel ROPS
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item fw-semibold" asp-page="/Rops/Panel">Przegląd</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li><a class="dropdown-item" asp-page="/Rops/Problemy">Problemy i luki</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Rops/Biblioteka">Biblioteka (kolejka)</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Rops/Weryfikacja">Fiszki do weryfikacji</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Rops/Ocena">Ocena wniosków</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Rops/PodgladTesterow">Testerzy</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Rops/KreatorNaboru">Nowy nabór</a></li>
+                                </ul>
+                            </li>
+                        }
+
+                        @if (admin)
+                        {
+                            <li class="nav-item dropdown">
+                                <button class="nav-link dropdown-toggle@(Akt("/Problemy/Moje") || Akt("/Middleman") || Akt("/Ekspert") ? " active" : "")"
+                                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-people" aria-hidden="true"></i> Widoki innych ról
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-page="/Problemy/Moje">Moje zgłoszenia (mieszkaniec)</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Middleman/Moje">Wdrożenia (instytucja)</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Ekspert/DoOceny">Do oceny (ekspert)</a></li>
+                                </ul>
+                            </li>
                         }
                     </ul>
 
-                    <form method="post" asp-page="/Index" asp-page-handler="ZmienRole" class="d-flex align-items-center gap-2">
-                        @Html.AntiForgeryToken()
-                        <label for="rolaDemo" class="form-label mb-0 small text-muted">Rola demonstracyjna:</label>
-                        <select id="rolaDemo" name="rola" class="form-select form-select-sm" aria-label="Rola demonstracyjna" style="width: auto;">
-                            @foreach (var r in Enum.GetValues<RolaUzytkownika>())
-                            {
-                                <option value="@r" selected="@(r == rola)">@r</option>
-                            }
-                        </select>
-                        <button type="submit" class="btn btn-sm btn-outline-primary">Zmień</button>
-                        @if (user is not null)
-                        {
-                            <span class="small text-muted ms-2" aria-live="polite">@user.Imie @user.Nazwisko</span>
-                        }
-                    </form>
+                    @if (mozeZglaszac)
+                    {
+                        <a class="btn btn-accent" asp-page="/Problemy/Zglos">
+                            <i class="bi bi-megaphone" aria-hidden="true"></i> Zgłoś problem
+                        </a>
+                    }
                 </div>
             </div>
         </nav>
     </header>
 
     <div class="container">
-        <main id="tresc" role="main" class="pb-3" tabindex="-1">
+        <p class="ws-role-hint" role="note">
+            <i class="bi bi-info-circle" aria-hidden="true"></i>
+            <strong>@Uprawnienia.Nazwa(rola):</strong> @Uprawnienia.Opis(rola)
+        </p>
+        <main id="tresc" class="pb-3" tabindex="-1">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted mt-5">
+    <footer class="border-top footer mt-5 bg-white">
         <div class="container py-3 small">
             <div class="d-flex flex-wrap gap-3 justify-content-between align-items-start">
                 <div>
@@ -88,7 +192,7 @@
                         <ul class="small mt-2 mb-0">
                             <li><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd> — nawigacja między elementami</li>
                             <li><kbd>Alt</kbd> + <kbd>→</kbd> / <kbd>←</kbd> — kolejny / poprzedni krok w kreatorze pomysłu</li>
-                            <li><kbd>Esc</kbd> — zamknięcie okna modalnego</li>
+                            <li><kbd>Esc</kbd> — zamknięcie okna modalnego lub menu</li>
                             <li>Pierwszym elementem po załadowaniu jest link „Przejdź do treści"</li>
                             <li>Serwis zaprojektowany zgodnie z <abbr title="Web Content Accessibility Guidelines 2.1 poziom AA">WCAG 2.1 AA</abbr>.</li>
                         </ul>

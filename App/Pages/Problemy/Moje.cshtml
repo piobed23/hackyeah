@@ -1,0 +1,53 @@
+@page
+@model App.Pages.Problemy.MojeModel
+@{
+    ViewData["Title"] = "Moje zgłoszenia";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="mb-0">Moje zgłoszenia</h1>
+    <a class="btn btn-accent" asp-page="/Problemy/Zglos"><i class="bi bi-megaphone" aria-hidden="true"></i> Nowe zgłoszenie</a>
+</div>
+
+@if (Model.Problemy.Count == 0)
+{
+    <div class="card">
+        <div class="card-body ws-empty">
+            <i class="bi bi-inbox" aria-hidden="true"></i>
+            <p class="mb-3">Nie zgłosiłeś jeszcze żadnego problemu.</p>
+            <a class="btn btn-primary" asp-page="/Problemy/Zglos">Zgłoś pierwszy problem</a>
+        </div>
+    </div>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var p in Model.Problemy)
+        {
+            var (etykieta, klasa, ikona) = p.Status switch
+            {
+                StatusProblemu.Zgloszony => ("Zgłoszony", "ws-badge-muted", "bi-inbox"),
+                StatusProblemu.Analizowany => ("Analizowany", "ws-badge-info", "bi-search"),
+                StatusProblemu.DopasowanoRozwiazanie => ("Dopasowano rozwiązanie", "ws-badge-success", "bi-patch-check-fill"),
+                StatusProblemu.Luka => ("Luka społeczna", "ws-badge-danger", "bi-exclamation-diamond"),
+                StatusProblemu.WRealizacji => ("W realizacji", "ws-badge-primary", "bi-gear"),
+                StatusProblemu.Rozwiazany => ("Rozwiązany", "ws-badge-success", "bi-check-circle"),
+                _ => ("Archiwalny", "ws-badge-muted", "bi-archive")
+            };
+            <li class="list-group-item d-flex flex-wrap justify-content-between align-items-start gap-2">
+                <div>
+                    <h2 class="h6 mb-1">@p.Tytul</h2>
+                    <p class="mb-1">
+                        <span class="ws-badge @klasa"><i class="bi @ikona" aria-hidden="true"></i>@etykieta</span>
+                        @if (p.PowiadamiajORozwiazaniu)
+                        {
+                            <span class="ws-badge ws-badge-info"><i class="bi bi-bell" aria-hidden="true"></i>Powiadomimy Cię</span>
+                        }
+                    </p>
+                    <p class="small mb-0">Zgłoszono @p.UtworzonoUtc.ToLocalTime().ToString("yyyy-MM-dd")@(string.IsNullOrWhiteSpace(p.Lokalizacja) ? "" : " · " + p.Lokalizacja)</p>
+                </div>
+                <a class="btn btn-sm btn-outline-primary" asp-page="/Problemy/Wyniki" asp-route-id="@p.Id">Zobacz dopasowania</a>
+            </li>
+        }
+    </ul>
+}

@@ -1,0 +1,40 @@
+@page
+@model App.Pages.Ekspert.DoOcenyModel
+@{
+    ViewData["Title"] = "Fiszki do oceny eksperckiej";
+}
+
+<h1 class="mb-2">Fiszki do oceny eksperckiej</h1>
+<p class="text-muted mb-4">Pracownik ROPS skierował te fiszki do konsultacji merytorycznej. Decyzję końcową podejmuje ROPS.</p>
+
+@if (Model.Fiszki.Count == 0)
+{
+    <div class="card">
+        <div class="card-body ws-empty">
+            <i class="bi bi-check2-circle" aria-hidden="true"></i>
+            <p class="mb-0">Brak fiszek oczekujących na Twoją ocenę.</p>
+        </div>
+    </div>
+}
+else
+{
+    @foreach (var f in Model.Fiszki)
+    {
+        <article class="card mb-3">
+            <div class="card-body">
+                <h2 class="h5">@f.Tytul</h2>
+                @if (!string.IsNullOrWhiteSpace(f.Streszczenie)) { <p class="mb-2">@f.Streszczenie</p> }
+                <details>
+                    <summary>Pokaż pełną fiszkę</summary>
+                    <dl class="ws-dl mt-3 mb-0">
+                        @if (!string.IsNullOrWhiteSpace(f.Problem)) { <dt>Problem</dt><dd>@f.Problem</dd> }
+                        @if (!string.IsNullOrWhiteSpace(f.GrupaDocelowa)) { <dt>Grupa docelowa</dt><dd>@f.GrupaDocelowa</dd> }
+                        @if (!string.IsNullOrWhiteSpace(f.Rozwiazanie)) { <dt>Rozwiązanie</dt><dd>@f.Rozwiazanie</dd> }
+                        @if (!string.IsNullOrWhiteSpace(f.Rezultaty)) { <dt>Rezultaty</dt><dd>@f.Rezultaty</dd> }
+                        @if (!string.IsNullOrWhiteSpace(f.Ryzyka)) { <dt>Ryzyka</dt><dd>@f.Ryzyka</dd> }
+                    </dl>
+                </details>
+            </div>
+        </article>
+    }
+}

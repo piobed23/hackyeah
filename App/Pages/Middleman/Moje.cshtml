@@ -1,0 +1,51 @@
+@page
+@model App.Pages.Middleman.MojeModel
+@{
+    ViewData["Title"] = "Moje wdrożenia";
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="mb-0">Moje wdrożenia</h1>
+    <a class="btn btn-primary" asp-page="/Biblioteka/Index"><i class="bi bi-journal-bookmark" aria-hidden="true"></i> Wybierz sprawdzoną innowację</a>
+</div>
+<p class="text-muted">Plany dostosowania sprawdzonych innowacji do Twojej instytucji. Plan zatwierdza instytucja, nie ROPS.</p>
+
+@if (Model.Wdrozenia.Count == 0)
+{
+    <div class="card">
+        <div class="card-body ws-empty">
+            <i class="bi bi-building" aria-hidden="true"></i>
+            <p class="mb-3">Nie masz jeszcze żadnego wdrożenia. Otwórz sprawdzoną innowację i kliknij „Dostosuj do naszej instytucji".</p>
+            <a class="btn btn-primary" asp-page="/Publiczne/DoTestowania">Zobacz innowacje</a>
+        </div>
+    </div>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var w in Model.Wdrozenia)
+        {
+            var (etykieta, klasa) = w.Status switch
+            {
+                StatusWdrozenia.Szkic => ("Szkic", "ws-badge-muted"),
+                StatusWdrozenia.Zatwierdzony => ("Zatwierdzony", "ws-badge-success"),
+                StatusWdrozenia.WRealizacji => ("W realizacji", "ws-badge-primary"),
+                _ => ("Zakończone", "ws-badge-success")
+            };
+            <li class="list-group-item d-flex flex-wrap justify-content-between align-items-start gap-2">
+                <div>
+                    <h2 class="h6 mb-1">@(w.Idea.Karta?.Tytul ?? "Innowacja")</h2>
+                    <p class="mb-1">
+                        <span class="ws-badge @klasa">@etykieta</span>
+                        @if (w.WybranyWariant is not null)
+                        {
+                            <span class="ws-badge ws-badge-info">Wariant: @w.WybranyWariant</span>
+                        }
+                    </p>
+                    <p class="small mb-0">@w.NazwaInstytucji · utworzono @w.UtworzonoUtc.ToLocalTime().ToString("yyyy-MM-dd")</p>
+                </div>
+                <a class="btn btn-sm btn-outline-primary" asp-page="/Middleman/Karta" asp-route-id="@w.Id">Otwórz</a>
+            </li>
+        }
+    </ul>
+}

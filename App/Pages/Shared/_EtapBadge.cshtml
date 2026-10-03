@@ -1,0 +1,18 @@
+@model EtapInnowacji
+@{
+    var (etykieta, klasa, ikona) = Model switch
+    {
+        EtapInnowacji.Pomysl => ("Pomysł", "ws-badge-muted", "bi-lightbulb"),
+        EtapInnowacji.PoszukujeFinansowania => ("Szuka finansowania", "ws-badge-warning", "bi-cash-coin"),
+        EtapInnowacji.FinansowaniePrzyznane => ("Finansowanie przyznane", "ws-badge-info", "bi-patch-check"),
+        EtapInnowacji.WPrzygotowaniu => ("W przygotowaniu", "ws-badge-info", "bi-hammer"),
+        EtapInnowacji.WRealizacji => ("W realizacji", "ws-badge-primary", "bi-gear"),
+        EtapInnowacji.PoszukujeTesterow => ("Szuka testerów", "ws-badge-warning", "bi-people"),
+        EtapInnowacji.WTestach => ("W testach", "ws-badge-primary", "bi-clipboard-check"),
+        EtapInnowacji.WPoprawie => ("W poprawie", "ws-badge-warning", "bi-arrow-repeat"),
+        EtapInnowacji.TestyZakonczone => ("Testy zakończone", "ws-badge-success", "bi-flag"),
+        EtapInnowacji.SprawdzonaInnowacja => ("Sprawdzona innowacja", "ws-badge-success", "bi-patch-check-fill"),
+        _ => (Model.ToString(), "ws-badge-muted", "bi-circle")
+    };
+}
+<span class="ws-badge @klasa"><i class="bi @ikona" aria-hidden="true"></i>@etykieta</span>

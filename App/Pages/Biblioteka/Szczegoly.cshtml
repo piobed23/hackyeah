@@ -1,4 +1,5 @@
 @page
+@inject App.Services.Context.IAuthContext Auth
 @model App.Pages.Biblioteka.SzczegolyModel
 @{
     ViewData["Title"] = Model.Material.Tytul;
@@ -74,6 +75,8 @@
     }
 </article>
 
+@if (App.Infrastructure.Auth.Uprawnienia.MozeProponowacMaterial(Auth.GetRola()))
+{
 <section class="my-5" aria-labelledby="prop">
     <h2 id="prop" class="h5">Zaproponuj zmianę w tym materiale</h2>
     <p class="small text-muted">Pracownik ROPS porówna wersje i zdecyduje, czy wprowadzić poprawkę. Autor nie dowiaduje się o Twojej propozycji bez decyzji ROPS.</p>
@@ -114,3 +117,4 @@
         </form>
     </details>
 </section>
+}

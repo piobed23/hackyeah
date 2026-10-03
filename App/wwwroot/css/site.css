@@ -1,6 +1,44 @@
 /* ============================================================
-   ROPS Innowacje — WCAG 2.1 AA
+   ROPS Innowacje — motyw nad Bootstrap 5.3 · WCAG 2.1 AA
+   Wszystkie kolory pochodzą z tokenów :root. Kontrasty (tekst / tło):
+   ink/bg 14.6:1 · muted/white 5.9:1 · primary/white 6.9:1 · ink/accent 7.5:1
    ============================================================ */
+
+:root {
+    --ws-primary: #1F5C99;
+    --ws-primary-dark: #164472;
+    --ws-accent: #F2A33A;
+    --ws-accent-hover: #E39320;
+    --ws-ink: #1B2430;
+    --ws-muted: #5B6672;
+    --ws-bg: #F6F3EC;
+    --ws-surface: #FFFFFF;
+    --ws-border: #D8D2C4;
+    --ws-success: #1E6B43;
+    --ws-danger: #B3261E;
+    --ws-radius: 0.375rem;
+    --ws-shadow: none;
+    --ws-shadow-hover: 0 0 0 2px var(--ws-ink);
+
+    --bs-body-color: var(--ws-ink);
+    --bs-body-color-rgb: 27, 36, 48;
+    --bs-body-bg: var(--ws-bg);
+    --bs-secondary-color: var(--ws-muted);
+    --bs-border-color: var(--ws-border);
+    --bs-primary: var(--ws-primary);
+    --bs-primary-rgb: 31, 92, 153;
+    --bs-success: var(--ws-success);
+    --bs-success-rgb: 30, 107, 67;
+    --bs-danger: var(--ws-danger);
+    --bs-danger-rgb: 179, 38, 30;
+    --bs-link-color: var(--ws-primary);
+    --bs-link-color-rgb: 31, 92, 153;
+    --bs-link-hover-color: var(--ws-primary-dark);
+    --bs-link-hover-color-rgb: 22, 68, 114;
+    --bs-border-radius: 0.25rem;
+    --ws-serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', Palatino, serif;
+    --bs-border-radius-lg: var(--ws-radius);
+}
 
 html {
     font-size: 14px;
@@ -16,12 +54,25 @@ html {
 
 body {
     margin-bottom: 60px;
+    background-color: var(--ws-bg);
 }
 
-/* --- Fokus klawiatury (WCAG 2.4.7) --- */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: var(--ws-ink);
+    letter-spacing: -0.01em;
+}
+
+h1, h2, .h1, .h2, .display-5, .display-6, .ws-brand {
+    font-family: var(--ws-serif);
+    font-weight: 700;
+}
+
+/* --- Fokus klawiatury (WCAG 2.4.7) — podwójny pierścień czytelny na każdym tle --- */
 *:focus-visible {
-    outline: 3px solid #0d6efd;
+    outline: 3px solid var(--ws-ink);
     outline-offset: 2px;
+    box-shadow: 0 0 0 5px #fff;
     border-radius: 2px;
 }
 
@@ -29,9 +80,9 @@ body {
 .form-control:focus-visible,
 .form-check-input:focus-visible,
 .form-select:focus-visible {
-    outline: 3px solid #0d6efd;
+    outline: 3px solid var(--ws-ink);
     outline-offset: 2px;
-    box-shadow: none;
+    box-shadow: 0 0 0 5px #fff;
 }
 
 /* --- Skip link (widoczny po Tab) --- */
@@ -42,8 +93,8 @@ body {
     left: 1rem;
     z-index: 9999;
     padding: 0.75rem 1rem;
-    background: #0d6efd;
-    color: white;
+    background: var(--ws-primary-dark);
+    color: #fff;
     text-decoration: none;
     border-radius: 4px;
     width: auto;
@@ -54,31 +105,403 @@ body {
     font-weight: 600;
 }
 
-/* --- Zapewnij minimalny kontrast tekstu drugorzędnego (WCAG 1.4.3) --- */
+/* --- Tekst drugorzędny (WCAG 1.4.3) --- */
 .text-muted {
-    color: #595959 !important;
+    color: var(--ws-muted) !important;
 }
 
 .small, small, .form-text {
-    color: #4a4a4a;
+    color: var(--ws-muted);
 }
 
-/* --- Form legend jak label --- */
-fieldset > legend.form-label {
+/* --- Przyciski --- */
+.btn {
+    --bs-btn-font-weight: 600;
+    min-height: 2.5rem;
+}
+
+.btn-sm {
+    min-height: 2rem;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--ws-primary);
+    --bs-btn-border-color: var(--ws-primary);
+    --bs-btn-hover-bg: var(--ws-primary-dark);
+    --bs-btn-hover-border-color: var(--ws-primary-dark);
+    --bs-btn-active-bg: var(--ws-primary-dark);
+    --bs-btn-active-border-color: var(--ws-primary-dark);
+    --bs-btn-disabled-bg: var(--ws-primary);
+    --bs-btn-disabled-border-color: var(--ws-primary);
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--ws-primary);
+    --bs-btn-border-color: var(--ws-primary);
+    --bs-btn-hover-bg: var(--ws-primary);
+    --bs-btn-hover-border-color: var(--ws-primary);
+    --bs-btn-active-bg: var(--ws-primary-dark);
+    --bs-btn-active-border-color: var(--ws-primary-dark);
+}
+
+.btn-success {
+    --bs-btn-bg: var(--ws-success);
+    --bs-btn-border-color: var(--ws-success);
+    --bs-btn-hover-bg: #165235;
+    --bs-btn-hover-border-color: #165235;
+    --bs-btn-active-bg: #165235;
+    --bs-btn-active-border-color: #165235;
+}
+
+.btn-outline-success {
+    --bs-btn-color: var(--ws-success);
+    --bs-btn-border-color: var(--ws-success);
+    --bs-btn-hover-bg: var(--ws-success);
+    --bs-btn-hover-border-color: var(--ws-success);
+    --bs-btn-active-bg: #165235;
+    --bs-btn-active-border-color: #165235;
+}
+
+/* Akcent: ciepły bursztyn z ciemnym tekstem (7.5:1) */
+.btn-accent {
+    --bs-btn-color: var(--ws-ink);
+    --bs-btn-bg: var(--ws-accent);
+    --bs-btn-border-color: var(--ws-accent);
+    --bs-btn-hover-color: var(--ws-ink);
+    --bs-btn-hover-bg: var(--ws-accent-hover);
+    --bs-btn-hover-border-color: var(--ws-accent-hover);
+    --bs-btn-active-color: var(--ws-ink);
+    --bs-btn-active-bg: var(--ws-accent-hover);
+    --bs-btn-active-border-color: var(--ws-accent-hover);
+}
+
+.btn-outline-light {
+    --bs-btn-hover-color: var(--ws-primary-dark);
+}
+
+/* --- Karty --- */
+.card {
+    border-color: var(--ws-border);
+    border-radius: var(--ws-radius);
+    box-shadow: var(--ws-shadow);
+    background-color: var(--ws-surface);
+}
+
+.card.bg-light {
+    background-color: #EEF2F6 !important;
+}
+
+.ws-card-link {
+    transition: border-color 0.12s ease;
+}
+
+.ws-card-link:hover {
+    border-color: var(--ws-ink);
+    box-shadow: var(--ws-shadow-hover);
+}
+
+/* --- Pasek trybu demonstracyjnego --- */
+.ws-demo-bar {
+    background: var(--ws-ink);
+    color: #fff;
+    font-size: 0.875rem;
+}
+
+.ws-demo-bar label,
+.ws-demo-bar .text-muted,
+.ws-demo-bar small {
+    color: #E4E9EF !important;
+}
+
+.ws-demo-bar *:focus-visible {
+    outline-color: #fff;
+    box-shadow: 0 0 0 5px var(--ws-ink);
+}
+
+/* --- Nawigacja główna --- */
+.ws-navbar {
+    background: var(--ws-surface);
+    border-bottom: 2px solid var(--ws-ink);
+}
+
+.ws-brand {
+    color: var(--ws-primary-dark);
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+}
+
+.ws-brand .bi {
+    color: var(--ws-primary);
+}
+
+.ws-navbar .nav-link {
+    color: var(--ws-ink);
     font-weight: 500;
+    border-radius: 0;
+}
+
+.ws-navbar .nav-link:hover {
+    color: var(--ws-primary);
+    background: #ECE8DD;
+}
+
+.ws-navbar .nav-link.active,
+.ws-navbar .nav-link[aria-current="page"],
+.ws-navbar .dropdown-toggle.active {
+    color: var(--ws-primary-dark);
+    background: transparent;
+    box-shadow: inset 0 -3px 0 var(--ws-primary);
+}
+
+.ws-navbar .dropdown-menu {
+    border-color: var(--ws-border);
+    border-radius: var(--ws-radius);
+    box-shadow: var(--ws-shadow-hover);
+}
+
+.ws-navbar .dropdown-item.active,
+.ws-navbar .dropdown-item[aria-current="page"] {
+    background: var(--ws-primary);
+    color: #fff;
+}
+
+/* --- Hero strony startowej: bez gradientu, typografia i linia --- */
+.ws-hero {
+    background: transparent;
+    color: var(--ws-ink);
+    border-top: 4px solid var(--ws-ink);
+    border-bottom: 1px solid var(--ws-border);
+    border-radius: 0;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.ws-hero h1 {
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    line-height: 1.12;
+    max-width: 22ch;
+}
+
+.ws-hero .lead {
+    color: var(--ws-muted);
+    max-width: 58ch;
+}
+
+.ws-eyebrow {
+    display: inline-block;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ws-primary-dark);
+}
+
+/* --- Statystyki --- */
+
+.ws-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 2.5rem;
+    margin: 0 0 3rem;
+    padding: 0;
+    list-style: none;
+}
+
+.ws-stats li { display: flex; align-items: baseline; gap: 0.5rem; }
+.ws-stats strong { font-family: var(--ws-serif); font-size: 1.75rem; color: var(--ws-ink); }
+.ws-stats span { color: var(--ws-muted); }
+
+/* --- Kafelki ścieżek wejścia --- */
+.ws-tile {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+}
+
+.ws-tile:hover {
+    color: inherit;
+}
+
+.ws-tile-icon {
+    display: inline-block;
+    font-size: 1.25rem;
+    color: var(--ws-primary-dark);
+}
+
+.ws-tile-icon.is-accent,
+.ws-tile-icon.is-success { color: var(--ws-primary-dark); }
+
+.ws-tile.card {
+    border-width: 0 0 0 4px;
+    border-left-color: var(--ws-primary);
+    background: var(--ws-surface);
+}
+
+/* --- Kroki "Jak to działa" --- */
+.ws-steps {
+    list-style: none;
+    counter-reset: ws-step;
+    padding: 0;
+    margin: 0;
+}
+
+.ws-steps > li {
+    counter-increment: ws-step;
+    position: relative;
+    padding-left: 3rem;
+    min-height: 2.25rem;
+    border-top: 1px solid var(--ws-border);
+    padding-top: 0.6rem;
+}
+
+.ws-steps > li::before {
+    content: counter(ws-step, decimal-leading-zero);
+    position: absolute;
+    left: 0;
+    top: -0.15rem;
+    font-family: var(--ws-serif);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--ws-primary);
+}
+
+/* --- Odznaki etapów i statusów: kolor + tekst + ikona (nie sam kolor) --- */
+.ws-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3em 0.65em;
+    border-radius: 0.25rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.2;
+    border: 1px solid transparent;
+    vertical-align: middle;
+}
+
+.ws-badge-success { background: #E3F2EA; color: #14532D; border-color: #A9D5BC; }
+.ws-badge-warning { background: #FFF3DB; color: #7A4B00; border-color: #F0CD8E; }
+.ws-badge-info    { background: #E4EEF8; color: #164472; border-color: #B5CCE4; }
+.ws-badge-primary { background: var(--ws-primary); color: #fff; }
+.ws-badge-muted   { background: #E9EDF2; color: #3F4A56; border-color: #C9D1DA; }
+.ws-badge-danger  { background: #FBE9E7; color: #8A1C15; border-color: #E8B4AF; }
+
+/* --- Wyniki dopasowania: trzy poziomy --- */
+.ws-level {
+    border-left: 6px solid var(--ws-border);
+    border-radius: var(--ws-radius);
+    background: var(--ws-surface);
+    box-shadow: var(--ws-shadow);
+}
+
+.ws-level-success { border-left-color: var(--ws-success); }
+.ws-level-info    { border-left-color: var(--ws-primary); }
+.ws-level-warning { border-left-color: var(--ws-accent); }
+.ws-level-danger  { border-left-color: var(--ws-danger); }
+
+.ws-level-header {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+.ws-level-header .bi {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.ws-level-success .ws-level-header .bi { color: var(--ws-success); }
+.ws-level-info .ws-level-header .bi    { color: var(--ws-primary); }
+.ws-level-warning .ws-level-header .bi { color: #7A4B00; }
+.ws-level-danger .ws-level-header .bi  { color: var(--ws-danger); }
+
+.ws-match {
+    height: 0.5rem;
+    background: #E9EDF2;
+    border-radius: 999px;
+    min-width: 6rem;
+}
+
+.ws-match .progress-bar {
+    background: var(--ws-primary);
+    font-size: 0;
+}
+
+/* --- Pusty stan --- */
+.ws-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--ws-muted);
+}
+
+.ws-empty .bi {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* --- Lista opisowa na karcie pomysłu --- */
+.ws-dl dt {
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ws-muted);
+    font-weight: 700;
+}
+
+.ws-dl dd {
+    margin-bottom: 1rem;
+}
+
+/* --- Formularze --- */
+.form-label {
+    font-weight: 600;
+}
+
+.form-control,
+.form-select {
+    border-color: #7B8794; /* 3.7:1 na bieli — granica pola (WCAG 1.4.11) */
+    border-radius: 0.25rem;
+    min-height: 2.5rem;
+}
+
+.form-check-input {
+    border-color: #6B7785;
+}
+
+.form-check-input:checked {
+    background-color: var(--ws-primary);
+    border-color: var(--ws-primary);
+}
+
+fieldset > legend.form-label {
+    font-weight: 600;
     font-size: 1rem;
     margin-bottom: 0.5rem;
     float: none;
     width: auto;
 }
 
-/* --- Badges — więcej kontrastu --- */
+.text-danger, .invalid-feedback {
+    font-weight: 500;
+}
+
+/* Lepka kolumna pomocnicza na szerokich ekranach */
+@media (min-width: 992px) {
+    .ws-sticky {
+        position: sticky;
+        top: 1rem;
+    }
+}
+
+/* --- Odznaki Bootstrap — więcej kontrastu --- */
 .badge.bg-light {
     color: #1a1a1a !important;
     border: 1px solid #adb5bd !important;
 }
 
-/* --- Progress bars — tekst wewnątrz czytelny --- */
 .progress-bar {
     font-weight: 600;
     font-size: 0.875rem;
@@ -88,32 +511,7 @@ fieldset > legend.form-label {
 .table caption {
     caption-side: top;
     font-weight: 600;
-    color: #212529;
-}
-
-/* --- Required field marker (opcjonalnie) --- */
-.form-label[for]:not(:empty) + input[required],
-.form-label[for]:not(:empty) + textarea[required] {
-    border-left: 3px solid #0d6efd;
-}
-
-/* --- Komunikaty błędów po polsku są widoczne i kolorowe --- */
-.text-danger, .invalid-feedback {
-    font-weight: 500;
-}
-
-/* --- Panel AI dostępny z czytelnym kontrastem --- */
-.card.bg-light {
-    background-color: #f4f6f8 !important;
-}
-
-/* --- Minimalna szerokość klikalnych kontrolek (WCAG 2.5.5) --- */
-.btn, .form-control, .form-select {
-    min-height: 2.5rem;
-}
-
-.btn-sm {
-    min-height: 2rem;
+    color: var(--ws-ink);
 }
 
 /* --- Zoom 200% / 320px --- */
@@ -127,7 +525,7 @@ fieldset > legend.form-label {
     }
 }
 
-/* --- Reduce motion dla osób z nadwrażliwością (WCAG 2.3.3) --- */
+/* --- Reduce motion (WCAG 2.3.3) --- */
 @media (prefers-reduced-motion: reduce) {
     * {
         animation: none !important;
@@ -137,7 +535,7 @@ fieldset > legend.form-label {
 
 /* --- Print — PDF-przyjazny wydruk wniosku --- */
 @media print {
-    header, nav, footer, .btn, form, .alert {
+    header, nav, footer, .btn, form, .alert, .ws-demo-bar, .ws-role-hint {
         display: none !important;
     }
     body {
@@ -151,4 +549,16 @@ fieldset > legend.form-label {
     h1 { font-size: 18pt; }
     h2 { font-size: 14pt; }
     h3 { font-size: 12pt; }
+}
+
+/* --- Pasek "co możesz tu robić" (rola) --- */
+.ws-role-hint {
+    background: transparent;
+    color: var(--ws-ink);
+    border: 0;
+    border-left: 4px solid var(--ws-primary);
+    border-radius: 0;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 1rem;
+    font-size: 0.9375rem;
 }

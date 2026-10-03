@@ -4,27 +4,38 @@
     ViewData["Title"] = "Dopasowania do Twojego zgłoszenia";
 }
 
-<nav aria-label="okruszki" class="mb-2">
-    <a asp-page="/Problemy/Zglos" class="small">← Nowe zgłoszenie</a>
+<nav aria-label="Okruszki" class="mb-2">
+    <a asp-page="/Problemy/Zglos" class="small"><i class="bi bi-arrow-left" aria-hidden="true"></i> Nowe zgłoszenie</a>
 </nav>
 
-<h1>Dopasowania do Twojego zgłoszenia</h1>
-<p class="text-muted">
+<h1 class="mb-2">Dopasowania do Twojego zgłoszenia</h1>
+<p class="text-muted mb-4">
     Twój problem: <strong>„@Model.Problem.Tytul"</strong>
-    @if (!string.IsNullOrWhiteSpace(Model.Problem.Lokalizacja)) { <span>· @Model.Problem.Lokalizacja</span> }
+    @if (!string.IsNullOrWhiteSpace(Model.Problem.Lokalizacja)) { <span>· <i class="bi bi-geo-alt" aria-hidden="true"></i> @Model.Problem.Lokalizacja</span> }
 </p>
 
 @if (TempData["Komunikat"] is string msg)
 {
-    <div class="alert alert-success" role="status" aria-live="polite">@msg</div>
+    <div class="alert alert-success" role="status" aria-live="polite">
+        <i class="bi bi-check-circle" aria-hidden="true"></i> @msg
+    </div>
 }
+
+<div class="d-flex flex-wrap gap-2 mb-4" role="group" aria-label="Podsumowanie dopasowań">
+    <span class="ws-badge ws-badge-success"><i class="bi bi-patch-check-fill" aria-hidden="true"></i>Sprawdzone: @Model.Sprawdzone.Count</span>
+    <span class="ws-badge ws-badge-info"><i class="bi bi-gear" aria-hidden="true"></i>W realizacji lub testach: @Model.WTestach.Count</span>
+    <span class="ws-badge ws-badge-warning"><i class="bi bi-hourglass-split" aria-hidden="true"></i>Powstające: @Model.PoszukujaceFinansowania.Count</span>
+</div>
 
 @if (Model.Sprawdzone.Count > 0)
 {
-    <section class="my-4" aria-labelledby="s-sprawdz">
-        <div class="alert alert-success">
-            <h2 id="s-sprawdz" class="h5 mb-1">✓ Znaleźliśmy sprawdzone rozwiązanie</h2>
-            <p class="mb-0 small">Innowacja została przetestowana przez autorów i zatwierdzona przez ROPS.</p>
+    <section class="ws-level ws-level-success p-3 p-md-4 mb-4" aria-labelledby="s-sprawdz">
+        <div class="ws-level-header mb-3">
+            <i class="bi bi-patch-check-fill" aria-hidden="true"></i>
+            <div>
+                <h2 id="s-sprawdz" class="h5 mb-1">Znaleźliśmy sprawdzone rozwiązanie</h2>
+                <p class="mb-0 small">Innowacja została przetestowana przez autorów i zatwierdzona przez ROPS.</p>
+            </div>
         </div>
         <ul class="list-group">
             @foreach (var w in Model.Sprawdzone)
@@ -32,8 +43,14 @@
                 <li class="list-group-item d-flex justify-content-between align-items-start flex-wrap gap-2">
                     <div class="flex-grow-1">
                         <h3 class="h6 mb-1">@w.Tytul</h3>
-                        @if (!string.IsNullOrWhiteSpace(w.Streszczenie)) { <p class="small text-muted mb-1">@w.Streszczenie</p> }
-                        <p class="small mb-0">Dopasowanie: @((int)(w.Wynik * 100))%</p>
+                        @if (!string.IsNullOrWhiteSpace(w.Streszczenie)) { <p class="small mb-2">@w.Streszczenie</p> }
+                        <div class="d-flex align-items-center gap-2 small">
+                            <span>Dopasowanie: <strong>@((int)(w.Wynik * 100))%</strong></span>
+                            <div class="progress ws-match" role="progressbar" aria-label="Dopasowanie do Twojego zgłoszenia"
+                                 aria-valuenow="@((int)(w.Wynik * 100))" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar" style="width: @((int)(w.Wynik * 100))%"></div>
+                            </div>
+                        </div>
                     </div>
                     <a class="btn btn-sm btn-success" asp-page="/Publiczne/Karta" asp-route-id="@w.IdeaId">Zobacz rozwiązanie</a>
                 </li>
@@ -44,29 +61,30 @@
 
 @if (Model.WTestach.Count > 0)
 {
-    <section class="my-4" aria-labelledby="s-test">
-        <div class="alert alert-info">
-            <h2 id="s-test" class="h5 mb-1">▶ Podobne rozwiązanie jest obecnie realizowane lub testowane</h2>
-            <p class="mb-0 small">Możesz obserwować postęp albo zgłosić się do testów.</p>
+    <section class="ws-level ws-level-info p-3 p-md-4 mb-4" aria-labelledby="s-test">
+        <div class="ws-level-header mb-3">
+            <i class="bi bi-gear" aria-hidden="true"></i>
+            <div>
+                <h2 id="s-test" class="h5 mb-1">Podobne rozwiązanie jest obecnie realizowane lub testowane</h2>
+                <p class="mb-0 small">Możesz obserwować postęp albo zgłosić się do testów.</p>
+            </div>
         </div>
         <ul class="list-group">
             @foreach (var w in Model.WTestach)
             {
                 <li class="list-group-item d-flex justify-content-between align-items-start flex-wrap gap-2">
                     <div class="flex-grow-1">
-                        <h3 class="h6 mb-1">
-                            @w.Tytul
-                            <span class="badge bg-info text-dark ms-1">@w.Etap</span>
-                        </h3>
-                        @if (!string.IsNullOrWhiteSpace(w.Streszczenie)) { <p class="small text-muted mb-1">@w.Streszczenie</p> }
+                        <h3 class="h6 mb-1">@w.Tytul</h3>
+                        <p class="mb-1"><partial name="_EtapBadge" model="w.Etap" /></p>
+                        @if (!string.IsNullOrWhiteSpace(w.Streszczenie)) { <p class="small mb-0">@w.Streszczenie</p> }
                     </div>
                     <div class="d-flex gap-2">
-                        <a class="btn btn-sm btn-outline-info" asp-page="/Publiczne/Karta" asp-route-id="@w.IdeaId">Szczegóły</a>
+                        <a class="btn btn-sm btn-outline-primary" asp-page="/Publiczne/Karta" asp-route-id="@w.IdeaId">Szczegóły</a>
                         <form method="post" asp-page-handler="Obserwuj">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@Model.Id" />
                             <input type="hidden" name="ideaId" value="@w.IdeaId" />
-                            <button type="submit" class="btn btn-sm btn-info">Obserwuj</button>
+                            <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-bell" aria-hidden="true"></i> Obserwuj</button>
                         </form>
                     </div>
                 </li>
@@ -77,23 +95,24 @@
 
 @if (Model.PoszukujaceFinansowania.Count > 0)
 {
-    <section class="my-4" aria-labelledby="s-fin">
-        <div class="alert alert-warning">
-            <h2 id="s-fin" class="h5 mb-1">⌛ Powstaje pomysł odpowiadający na podobną potrzebę</h2>
-            <p class="mb-0 small">Nie jest to jeszcze sprawdzone rozwiązanie, ale ktoś już nad nim pracuje.</p>
+    <section class="ws-level ws-level-warning p-3 p-md-4 mb-4" aria-labelledby="s-fin">
+        <div class="ws-level-header mb-3">
+            <i class="bi bi-hourglass-split" aria-hidden="true"></i>
+            <div>
+                <h2 id="s-fin" class="h5 mb-1">Powstaje pomysł odpowiadający na podobną potrzebę</h2>
+                <p class="mb-0 small">Nie jest to jeszcze sprawdzone rozwiązanie, ale ktoś już nad nim pracuje.</p>
+            </div>
         </div>
         <ul class="list-group">
             @foreach (var w in Model.PoszukujaceFinansowania)
             {
                 <li class="list-group-item d-flex justify-content-between align-items-start flex-wrap gap-2">
                     <div class="flex-grow-1">
-                        <h3 class="h6 mb-1">
-                            @w.Tytul
-                            <span class="badge bg-warning text-dark ms-1">@w.Etap</span>
-                        </h3>
-                        @if (!string.IsNullOrWhiteSpace(w.Streszczenie)) { <p class="small text-muted mb-1">@w.Streszczenie</p> }
+                        <h3 class="h6 mb-1">@w.Tytul</h3>
+                        <p class="mb-1"><partial name="_EtapBadge" model="w.Etap" /></p>
+                        @if (!string.IsNullOrWhiteSpace(w.Streszczenie)) { <p class="small mb-0">@w.Streszczenie</p> }
                     </div>
-                    <a class="btn btn-sm btn-outline-warning" asp-page="/Publiczne/Karta" asp-route-id="@w.IdeaId">Zobacz pomysł</a>
+                    <a class="btn btn-sm btn-outline-primary" asp-page="/Publiczne/Karta" asp-route-id="@w.IdeaId">Zobacz pomysł</a>
                 </li>
             }
         </ul>
@@ -102,37 +121,40 @@
 
 @if (Model.Luka)
 {
-    <section class="my-4" aria-labelledby="s-luka">
-        <div class="alert alert-danger">
-            <h2 id="s-luka" class="h5 mb-1">! Nie znaleźliśmy rozwiązania</h2>
-            <p class="mb-2">
-                Twój problem wygląda na <strong>lukę społeczną</strong> — nikt jeszcze nie zbudował dla niego innowacji.
-                ROPS zobaczy skalę i lokalizację zgłoszenia i może zaprosić autorów do opracowania rozwiązania.
-            </p>
-            <p class="mb-0 small">Zostaw „Powiadom mnie" aktywne, żeby otrzymać informację, gdy coś się pojawi.</p>
+    <section class="ws-level ws-level-danger p-3 p-md-4 mb-4" aria-labelledby="s-luka">
+        <div class="ws-level-header mb-3">
+            <i class="bi bi-exclamation-diamond" aria-hidden="true"></i>
+            <div>
+                <h2 id="s-luka" class="h5 mb-1">Nie znaleźliśmy rozwiązania</h2>
+                <p class="mb-2">
+                    Twój problem wygląda na <strong>lukę społeczną</strong> — nikt jeszcze nie zbudował dla niego innowacji.
+                    ROPS zobaczy skalę i lokalizację zgłoszenia i może zaprosić autorów do opracowania rozwiązania.
+                </p>
+                <p class="mb-0 small">Zostaw „Powiadom mnie" aktywne, żeby otrzymać informację, gdy coś się pojawi.</p>
+            </div>
         </div>
 
         <div class="d-flex gap-2 flex-wrap">
-            <a class="btn btn-primary" asp-page="/Kreator/Rodzaj">Chcę sam zaproponować pomysł</a>
+            <a class="btn btn-primary" asp-page="/Kreator/Rodzaj"><i class="bi bi-lightbulb" aria-hidden="true"></i> Chcę sam zaproponować pomysł</a>
         </div>
     </section>
 }
 
 @if (Model.PodobneProblemy.Count > 0)
 {
-    <section class="my-4" aria-labelledby="s-po-pr">
-        <h2 id="s-po-pr" class="h5">Inne osoby zgłaszały podobny problem (@Model.PodobneProblemy.Count)</h2>
+    <section class="mb-4" aria-labelledby="s-po-pr">
+        <h2 id="s-po-pr" class="h5 mb-3"><i class="bi bi-people text-primary" aria-hidden="true"></i> Inne osoby zgłaszały podobny problem (@Model.PodobneProblemy.Count)</h2>
         <ul class="list-group">
             @foreach (var p in Model.PodobneProblemy)
             {
                 <li class="list-group-item">
                     <strong>@p.Tytul</strong>
-                    <span class="small text-muted">— @p.Lokalizacja @p.UtworzonoUtc.ToLocalTime():yyyy-MM-dd</span>
+                    <span class="small text-muted">— @p.Lokalizacja · @p.UtworzonoUtc.ToLocalTime().ToString("yyyy-MM-dd")</span>
                     <p class="small mb-0">@p.Opis</p>
                 </li>
             }
         </ul>
-        <p class="small text-muted mt-2">
+        <p class="small mt-2">
             Zgłoszenia o podobnej treści są automatycznie zestawiane. ROPS widzi skalę potrzeby i może włączyć je w diagnozę.
         </p>
     </section>
