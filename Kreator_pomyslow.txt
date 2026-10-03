@@ -1,0 +1,593 @@
+Mamy ustalone. Poniżej finalny, dokładny flow wyłącznie **Kreatora pomysłów**, uwzględniający fiszki, konsultacje, nabory i pełne składanie wniosków wewnątrz platformy — podobnie jak w systemie Witkac.
+
+## Uczestnicy procesu
+
+- **Autor** — mieszkaniec, NGO, instytucja lub innowator tworzący pomysł.
+- **System i asystent AI** — prowadzą autora, wyszukują podobieństwa i sprawdzają kompletność.
+- **Pracownik ROPS** — weryfikuje pomysły, tworzy nabory i prowadzi ocenę wniosków.
+- **Mieszkańcy** — głosują, komentują i zgłaszają zainteresowanie testami.
+- **Ekspert** — opcjonalnie ocenia merytorycznie pomysł lub wniosek.
+
+# Pełne flow Kreatora pomysłów
+
+## Etap 1. Rozpoczęcie pracy
+
+1. Użytkownik wchodzi do Kreatora.
+2. System pokazuje „Moje pomysły”:
+
+   - szkice;
+   - fiszki wysłane do weryfikacji;
+   - pomysły wymagające poprawy;
+   - pomysły publiczne;
+   - przygotowywane wnioski;
+   - historię złożonych wniosków.
+
+3. Użytkownik klika „Dodaj pomysł”.
+4. System tworzy szkic i automatycznie go zapisuje.
+
+Status:
+
+> Szkic
+
+## Etap 2. Wybór rodzaju pomysłu
+
+Autor wybiera jedną opcję:
+
+- nowy pomysł na innowację;
+- dobra praktyka;
+- rozwiązanie testowane w mikroskali.
+
+Od wyboru zależą pytania w formularzu.
+
+## Etap 3. Opis potrzeby
+
+Autor odpowiada:
+
+- jaki problem chce rozwiązać;
+- kogo problem dotyczy;
+- gdzie występuje;
+- jakie są jego skutki;
+- skąd wiadomo, że problem rzeczywiście istnieje;
+- czy rozwiązanie dotyczy konkretnego obszaru Małopolski.
+
+Asystent AI:
+
+- tłumaczy pytania;
+- podaje przykłady;
+- wskazuje zbyt ogólne odpowiedzi;
+- prosi o doprecyzowanie;
+- nie wymyśla faktów za autora.
+
+## Etap 4. Sprawdzenie podobnych rozwiązań
+
+Po opisaniu problemu system porównuje zgłoszenie z:
+
+- Biblioteką Innowacji Społecznych;
+- publicznymi fiszkami innych pomysłów;
+- projektami w trakcie realizacji;
+- projektami oczekującymi na finansowanie;
+- pomysłami wcześniej zgłoszonymi do naborów.
+
+Następuje rozgałęzienie.
+
+### Znaleziono sprawdzoną innowację
+
+Autor może:
+
+- zobaczyć istniejące rozwiązanie;
+- zakończyć tworzenie duplikatu;
+- utworzyć pomysł adaptacji;
+- kontynuować i opisać różnicę.
+
+### Znaleziono podobny pomysł
+
+Autor może:
+
+- zobaczyć publiczną kartę;
+- oznaczyć, że pomysł jest podobny;
+- kontynuować i wyjaśnić różnice;
+- zgodzić się na propozycję połączenia.
+
+System nie łączy autorów automatycznie i nie udostępnia danych kontaktowych.
+
+### Znaleziono ten sam problem, ale inne rozwiązanie
+
+Pomysł pozostaje osobny, ale zostaje przypisany do wspólnego obszaru problemowego.
+
+### Nie znaleziono rozwiązania
+
+Autor przechodzi dalej bez ostrzeżenia.
+
+## Etap 5. Opis innowacji
+
+Autor uzupełnia:
+
+- nazwę pomysłu;
+- krótkie streszczenie;
+- istotę rozwiązania;
+- sposób działania;
+- grupę odbiorców;
+- spodziewany rezultat;
+- etap realizacji;
+- obszar działania;
+- potrzebne zasoby;
+- posiadane zasoby;
+- partnerów, jeżeli już istnieją;
+- dotychczasowe testy;
+- załączniki, zdjęcia, filmy lub dokumenty.
+
+Asystent AI może:
+
+- uporządkować treść;
+- skrócić opis;
+- pomóc określić odbiorców;
+- wskazać niewyjaśnione elementy;
+- zaproponować ryzyka;
+- pomóc przygotować wizualizację;
+- przedstawić propozycję rozwinięcia pomysłu.
+
+Każda zmiana AI wymaga zatwierdzenia przez autora.
+
+## Etap 6. Utworzenie fiszki
+
+System składa informacje w fiszkę:
+
+1. nazwa;
+2. problem;
+3. odbiorcy;
+4. proponowane rozwiązanie;
+5. sposób działania;
+6. spodziewana zmiana;
+7. etap realizacji;
+8. obszar;
+9. potrzebne zasoby;
+10. dotychczasowe działania;
+11. załączniki.
+
+System sprawdza:
+
+- wymagane pola;
+- limity znaków;
+- potencjalne dane osobowe;
+- dane wrażliwe;
+- brak zgody na publikację;
+- niespójności;
+- podejrzenie duplikatu.
+
+Autor może:
+
+- wrócić do edycji;
+- zapisać szkic;
+- wysłać fiszkę do ROPS.
+
+Status:
+
+> Przekazany do weryfikacji
+
+## Etap 7. Weryfikacja przez ROPS
+
+Pracownik ROPS otwiera fiszkę i sprawdza:
+
+- kompletność;
+- związek z innowacjami społecznymi;
+- zgodność z zasadami;
+- bezpieczeństwo treści;
+- możliwość publikacji;
+- podobieństwo do istniejących projektów;
+- deklarowany etap realizacji.
+
+Możliwe decyzje:
+
+### Zaakceptuj
+
+Fiszka może zostać opublikowana.
+
+### Poproś o poprawę
+
+Pracownik wskazuje konkretne pola. Autor otrzymuje powiadomienie, poprawia fiszkę i wysyła ją ponownie.
+
+Status:
+
+> Wymaga uzupełnienia
+
+### Zaproponuj połączenie
+
+Administrator widzi podobne pomysły i może zaproponować autorom połączenie. Autorzy nie otrzymują swoich danych kontaktowych — proces kontroluje ROPS.
+
+### Odrzuć
+
+Pracownik musi podać uzasadnienie.
+
+Status:
+
+> Odrzucony
+
+### Skieruj do oceny eksperta
+
+Pomysł trafia do konsultacji merytorycznej.
+
+Status:
+
+> Konsultacja ekspercka
+
+## Etap 8. Zgoda autora na publikację
+
+Po pozytywnej weryfikacji autor zatwierdza:
+
+- publiczny opis;
+- sposób podpisania;
+- zgodę na komentarze;
+- zgodę na głosowanie;
+- zgodę na zgłoszenia do testów;
+- zgodę na pokazywanie etapu realizacji.
+
+Pełny wniosek, dane kontaktowe i wewnętrzne materiały nie są publikowane.
+
+Status:
+
+> Opublikowany
+
+## Etap 9. Publiczna karta pomysłu
+
+Publicznie widoczne są:
+
+- nazwa;
+- problem;
+- grupa odbiorców;
+- opis rozwiązania;
+- etap;
+- obszar działania;
+- aktualne potrzeby;
+- materiały publiczne;
+- liczba głosów;
+- komentarze;
+- zainteresowanie testami;
+- informacja o finansowaniu lub jego braku.
+
+Wyraźne oznaczenia:
+
+- „Pomysł”;
+- „Poszukuje finansowania”;
+- „Finansowanie przyznane”;
+- „W przygotowaniu”;
+- „W trakcie realizacji”;
+- „W trakcie testów”;
+- „Sprawdzona innowacja”.
+
+## Etap 10. Konsultacje społeczne
+
+Mieszkaniec może:
+
+- poprzeć pomysł;
+- zaznaczyć „ten problem mnie dotyczy”;
+- skomentować;
+- zgłosić chęć udziału w testach;
+- zaznaczyć „moja organizacja może pomóc”;
+- wskazać podobne rozwiązanie.
+
+Nie dochodzi do bezpośredniego kontaktu z autorem.
+
+Administrator widzi:
+
+- dane kontaktowe osób, które wyraziły zgodę;
+- zgłoszenia testerów;
+- propozycje organizacji;
+- komentarze;
+- liczbę popierających;
+- powiązane problemy z głównego flow.
+
+Autor widzi zagregowane informacje, np.:
+
+> 54 osoby popierają pomysł, 18 osób chce wziąć udział w testach, 2 organizacje zadeklarowały możliwość pomocy.
+
+## Etap 11. Powiązanie z problemami mieszkańców
+
+Gdy w głównym module zostanie zgłoszony podobny problem, system może pokazać:
+
+- sprawdzoną innowację;
+- projekt w trakcie realizacji;
+- pomysł poszukujący finansowania.
+
+Osoba zgłaszająca problem może wybrać:
+
+- „Powiadom mnie o postępach”;
+- „Chcę uczestniczyć w testach”;
+- „Ten pomysł odpowiada na moją potrzebę”.
+
+Administrator widzi powiązanie konkretnego problemu z innowacją, ale autor innowacji nie otrzymuje bezpośrednio danych zgłaszającego.
+
+Dzięki temu system zbiera dowody zapotrzebowania dla projektu.
+
+## Etap 12. Utworzenie naboru przez pracownika ROPS
+
+Pracownik ręcznie tworzy nabór w systemie.
+
+Uzupełnia:
+
+- nazwę;
+- organizatora;
+- opis i cel;
+- grupy uprawnione;
+- obszary tematyczne;
+- termin rozpoczęcia i zakończenia;
+- dostępny budżet;
+- minimalną i maksymalną kwotę;
+- kryteria;
+- regulamin;
+- wymagane załączniki;
+- strukturę formularza;
+- tabelę budżetu;
+- harmonogram;
+- oświadczenia;
+- sposób oceny.
+
+Status naboru:
+
+- szkic;
+- zaplanowany;
+- aktywny;
+- zamknięty;
+- w trakcie oceny;
+- rozstrzygnięty;
+- archiwalny.
+
+## Etap 13. Dopasowanie pomysłów do naboru
+
+Po aktywowaniu naboru system porównuje go ze wszystkimi kwalifikującymi się fiszkami.
+
+Autor widzi wszystkie pasujące nabory, np.:
+
+| Nabór | Dopasowanie | Termin | Możliwe finansowanie |
+|---|---:|---:|---:|
+| Aktywizacja seniorów | 92% | 20 dni | do 100 000 zł |
+| Usługi społeczne na wsi | 76% | 35 dni | do 150 000 zł |
+
+System wyjaśnia dopasowanie:
+
+- zgodna grupa odbiorców;
+- zgodny obszar tematyczny;
+- odpowiedni etap projektu;
+- zgodny obszar geograficzny;
+- brakujące wymaganie, np. partner.
+
+Autor otrzymuje powiadomienie o nowym pasującym naborze.
+
+## Etap 14. Rozpoczęcie wniosku
+
+Autor wybiera:
+
+> Przygotuj wniosek z tego pomysłu
+
+Jeden pomysł może mieć kilka osobnych wniosków do różnych naborów.
+
+System:
+
+1. tworzy nowy wniosek;
+2. kopiuje odpowiednie dane z fiszki;
+3. dopasowuje je do formularza naboru;
+4. zaznacza pola wymagające potwierdzenia;
+5. pokazuje brakujące sekcje.
+
+Status:
+
+> Wniosek — szkic
+
+## Etap 15. Wypełnianie wniosku
+
+Cały proces odbywa się wewnątrz platformy.
+
+Formularz może obejmować:
+
+- opis projektu;
+- uzasadnienie potrzeby;
+- grupę docelową;
+- cele;
+- działania;
+- rezultaty;
+- wskaźniki;
+- harmonogram;
+- zespół;
+- partnerów;
+- ryzyka;
+- trwałość rezultatów;
+- budżet;
+- źródła finansowania;
+- oświadczenia;
+- załączniki.
+
+Do uzasadnienia system może zaproponować:
+
+- liczbę powiązanych problemów;
+- liczbę popierających;
+- liczbę zainteresowanych testerów;
+- zagregowane wnioski z komentarzy;
+- dane z konsultacji.
+
+Autor wybiera, które dane chce wykorzystać.
+
+## Etap 16. Tabela budżetowa
+
+Autor uzupełnia:
+
+- kategorię kosztu;
+- opis wydatku;
+- liczbę jednostek;
+- koszt jednostkowy;
+- wartość całkowitą;
+- źródło finansowania;
+- uzasadnienie kosztu.
+
+System:
+
+- automatycznie liczy sumy;
+- sprawdza limity;
+- wskazuje przekroczenia;
+- kontroluje wymagany wkład własny;
+- sprawdza zgodność kwot;
+- ostrzega o pustych polach.
+
+AI może pomóc opisać uzasadnienie, ale kwoty zatwierdza autor.
+
+## Etap 17. Kontrola kompletności
+
+Przed wysłaniem system sprawdza:
+
+- wszystkie pola obowiązkowe;
+- limity znaków;
+- zgodność budżetu;
+- wymagane załączniki;
+- wymagane oświadczenia;
+- termin naboru;
+- zgodność danych autora;
+- niespójności między harmonogramem i budżetem.
+
+Wynik:
+
+```text
+Kompletność: 94%
+
+Do poprawy:
+– brak załącznika,
+– nieuzasadniona pozycja budżetowa,
+– suma etapów harmonogramu nie zgadza się z terminem.
+```
+
+## Etap 18. Złożenie wniosku
+
+Autor:
+
+1. ogląda finalny podgląd;
+2. zatwierdza oświadczenia;
+3. składa wniosek w systemie;
+4. otrzymuje numer i potwierdzenie;
+5. nie może swobodnie zmieniać złożonej wersji.
+
+Status:
+
+> Złożony
+
+System zapisuje dokładną wersję i datę złożenia.
+
+## Etap 19. Ocena przez ROPS
+
+Pracownik może oznaczyć wniosek jako:
+
+- złożony;
+- w trakcie kontroli formalnej;
+- wymaga uzupełnienia;
+- formalnie zaakceptowany;
+- w trakcie oceny merytorycznej;
+- rekomendowany;
+- wybrany do finansowania;
+- niewybrany;
+- odrzucony formalnie.
+
+Jeśli potrzebne jest uzupełnienie:
+
+1. ROPS wskazuje konkretne pola;
+2. autor otrzymuje termin;
+3. edytuje tylko odblokowane sekcje;
+4. ponownie wysyła uzupełnienie;
+5. system zachowuje historię zmian.
+
+## Etap 20. Wynik naboru
+
+### Projekt otrzymuje finansowanie
+
+Status innowacji zmienia się na:
+
+> Finansowanie przyznane
+
+Następnie pracownik ROPS zatwierdza kolejne etapy:
+
+- w przygotowaniu;
+- w trakcie realizacji;
+- w trakcie testów;
+- zakończony;
+- sprawdzony.
+
+Osoby obserwujące powiązane problemy otrzymują powiadomienia.
+
+### Projekt nie otrzymuje finansowania
+
+Fiszka pozostaje w systemie.
+
+Autor może:
+
+- poprawić pomysł;
+- wykorzystać go w następnym naborze;
+- zachować wyniki konsultacji;
+- przygotować nową wersję wniosku;
+- szukać innego źródła finansowania.
+
+## Finalne statusy
+
+### Fiszka pomysłu
+
+```text
+Szkic
+→ Przekazany do weryfikacji
+→ Wymaga uzupełnienia
+→ Zaakceptowany
+→ Opublikowany
+→ Archiwalny
+```
+
+Możliwe odgałęzienia:
+
+```text
+Konsultacja ekspercka
+Odrzucony
+Propozycja połączenia
+```
+
+### Wniosek
+
+```text
+Szkic
+→ Gotowy do złożenia
+→ Złożony
+→ Kontrola formalna
+→ Ocena merytoryczna
+→ Wybrany / Niewybrany
+```
+
+### Etap innowacji
+
+```text
+Pomysł
+→ Poszukuje finansowania
+→ Finansowanie przyznane
+→ W przygotowaniu
+→ W realizacji
+→ W testach
+→ Zakończona
+→ Sprawdzona innowacja
+```
+
+## Widoki Kreatora
+
+Finalnie moduł potrzebuje:
+
+1. Strona startowa Kreatora.
+2. Moje pomysły i wnioski.
+3. Wybór rodzaju pomysłu.
+4. Wieloetapowy formularz pomysłu z AI.
+5. Wyniki wyszukiwania podobnych rozwiązań.
+6. Podgląd fiszki.
+7. Publiczna karta pomysłu.
+8. Edycja fiszki wymagającej poprawy.
+9. Lista dostępnych naborów.
+10. Szczegóły naboru.
+11. Generator wniosku.
+12. Tabela budżetowa.
+13. Harmonogram projektu.
+14. Kontrola kompletności.
+15. Podgląd i złożenie wniosku.
+16. Status i historia wniosku.
+17. Widok pracownika ROPS do weryfikacji fiszki.
+18. Kreator naboru dla pracownika ROPS.
+19. Widok oceny wniosku.
+20. Widok zgłoszeń testerów i organizacji — dostępny tylko dla administratora.
+
+To jest pełny docelowy flow. Przy implementacji możemy go ograniczyć do jednej kompletnej ścieżki demonstracyjnej, ale architektura i prezentacja będą pokazywać zamknięty proces od pomysłu aż do sprawdzonej innowacji.
