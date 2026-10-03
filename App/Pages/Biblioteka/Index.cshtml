@@ -1,5 +1,6 @@
 @page
 @using App.Infrastructure.Enums
+@inject App.Services.Context.IAuthContext Auth
 @model App.Pages.Biblioteka.IndexModel
 @{
     ViewData["Title"] = "Biblioteka";
@@ -40,7 +41,10 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <p class="mb-0 text-muted small">Znaleziono @Model.Materialy.Count materiałów.</p>
-    <a class="btn btn-outline-primary btn-sm" asp-page="/Biblioteka/Dodaj">+ Zaproponuj materiał</a>
+    @if (App.Infrastructure.Auth.Uprawnienia.MozeProponowacMaterial(Auth.GetRola()))
+    {
+        <a class="btn btn-outline-primary btn-sm" asp-page="/Biblioteka/Dodaj"><i class="bi bi-plus-lg" aria-hidden="true"></i> Zaproponuj materiał</a>
+    }
 </div>
 
 @if (Model.Materialy.Count == 0)

@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace App.Pages.Problemy;
 
-[AllowAnonymous]
 public class ZglosModel : PageModel
 {
     private readonly AppDbContext _db;

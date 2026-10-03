@@ -41,6 +41,7 @@ public class SzczegolyModel : PageModel
     {
         var user = _auth.GetUser();
         if (user is null) return Forbid();
+        if (!App.Infrastructure.Auth.Uprawnienia.MozeProponowacMaterial(_auth.GetRola())) return Forbid();
         var m = await _db.LibraryItems.FirstOrDefaultAsync(l => l.Id == Id);
         if (m is null) return NotFound();
 

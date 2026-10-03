@@ -1,102 +1,149 @@
 @page
 @model IndexModel
+@using App.Infrastructure.Auth
+@inject App.Services.Context.IAuthContext Auth
 @{
     ViewData["Title"] = "Start";
+    var rola = Auth.GetRola();
+    var mozeZglaszac = Uprawnienia.MozeZglaszacProblem(rola);
+    var czyAutor = Uprawnienia.MozeTworzycPomysly(rola);
+    var czyRops = Uprawnienia.PracujeWRops(rola);
+    var czyInstytucja = Uprawnienia.MozeDostosowacInnowacje(rola);
+    var mozeTestowac = Uprawnienia.MozeGlosowacIKomentowac(rola);
 }
 
-<section class="py-4">
-    <h1>Platforma Innowacji Społecznych ROPS Małopolska</h1>
-    <p class="lead">
-        Zgłaszaj pomysły, konsultuj z mieszkańcami, aplikuj o finansowanie i testuj rozwiązania —
-        wszystko w jednym miejscu.
-    </p>
-</section>
-
-<section class="row g-3 my-3" aria-label="Statystyki platformy">
-    <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <p class="display-6 mb-0">@Model.LiczbaInnowacji</p>
-                <p class="text-muted small mb-0">pomysłów w systemie</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <p class="display-6 mb-0">@Model.LiczbaOpublikowanych</p>
-                <p class="text-muted small mb-0">opublikowanych fiszek</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <p class="display-6 mb-0">@Model.LiczbaAktywnychNaborow</p>
-                <p class="text-muted small mb-0">aktywnych naborów</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-6 col-md-3">
-        <div class="card h-100">
-            <div class="card-body text-center">
-                <p class="display-6 mb-0">@Model.LiczbaProblemow</p>
-                <p class="text-muted small mb-0">zgłoszonych problemów</p>
+<section class="ws-hero py-4 py-md-5 mb-4" aria-labelledby="hero-h">
+    <div class="row align-items-center">
+        <div class="col-lg-8">
+            <span class="ws-eyebrow mb-2">ROPS Małopolska · Hub Innowacji Społecznych</span>
+            <h1 id="hero-h" class="mb-3">Dobre pomysły na problemy społeczne nie powinny ginąć</h1>
+            <p class="lead mb-4">
+                Opisz problem, znajdź sprawdzone rozwiązanie, rozwiń własny pomysł, złóż wniosek
+                i przetestuj innowację z mieszkańcami — wszystko w jednym miejscu.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                @if (mozeZglaszac)
+                {
+                    <a class="btn btn-accent btn-lg" asp-page="/Problemy/Zglos">
+                        <i class="bi bi-megaphone" aria-hidden="true"></i> Zgłoś problem
+                    </a>
+                }
+                else if (czyRops)
+                {
+                    <a class="btn btn-accent btn-lg" asp-page="/Rops/Panel">
+                        <i class="bi bi-speedometer2" aria-hidden="true"></i> Przejdź do panelu ROPS
+                    </a>
+                }
+                else if (rola == RolaUzytkownika.Ekspert)
+                {
+                    <a class="btn btn-accent btn-lg" asp-page="/Ekspert/DoOceny">
+                        <i class="bi bi-clipboard-check" aria-hidden="true"></i> Fiszki do oceny
+                    </a>
+                }
+                <a class="btn btn-outline-primary btn-lg" asp-page="/Biblioteka/Index">
+                    <i class="bi bi-journal-bookmark" aria-hidden="true"></i> Przeglądaj Bibliotekę
+                </a>
             </div>
         </div>
     </div>
 </section>
 
-<section class="my-4">
-    <h2>Jak to działa</h2>
-    <ol>
-        <li><strong>Autor</strong> opisuje pomysł w kreatorze. Asystent AI pomaga doprecyzować.</li>
-        <li>System porównuje pomysł z <strong>Biblioteką Innowacji Społecznych</strong> i podobnymi zgłoszeniami.</li>
-        <li>Fiszkę weryfikuje <strong>pracownik ROPS</strong>. Po akceptacji trafia na publiczną kartę.</li>
-        <li><strong>Mieszkańcy</strong> popierają, komentują, zgłaszają chęć testowania.</li>
-        <li>Autor składa <strong>wniosek</strong> w nabory ROPS i testuje rozwiązanie z zainteresowanymi.</li>
-        <li>Sprawdzona innowacja wraca do biblioteki jako gotowe rozwiązanie dla innych.</li>
-    </ol>
-</section>
+<ul class="ws-stats" aria-label="Statystyki platformy">
+    <li><strong>@Model.LiczbaInnowacji</strong><span>pomysłów w systemie</span></li>
+    <li><strong>@Model.LiczbaOpublikowanych</strong><span>opublikowanych fiszek</span></li>
+    <li><strong>@Model.LiczbaAktywnychNaborow</strong><span>aktywnych naborów</span></li>
+    <li><strong>@Model.LiczbaProblemow</strong><span>zgłoszonych problemów</span></li>
+</ul>
 
-<section class="my-4">
-    <h2>Zacznij</h2>
+<section class="mb-5" aria-labelledby="sciezki-h">
+    <h2 id="sciezki-h" class="h3 mb-1">Od czego zaczynasz?</h2>
+    <p class="text-muted mb-3">Wybierz ścieżkę, która najlepiej opisuje Twoją sytuację.</p>
+
     <div class="row g-3">
-        <div class="col-md-4">
-            <div class="card h-100">
+        @if (mozeZglaszac)
+        {
+        <div class="col-md-6 col-lg-4">
+            <a class="card ws-card-link ws-tile" asp-page="/Problemy/Zglos">
                 <div class="card-body">
-                    <h3 class="h5">Mam pomysł</h3>
-                    <p>Opisz pomysł, dostań podpowiedzi AI, zobacz podobne rozwiązania.</p>
-                    <a class="btn btn-primary" asp-page="/Kreator/Rodzaj">Otwórz kreator</a>
+                    <span class="ws-tile-icon is-accent"><i class="bi bi-megaphone" aria-hidden="true"></i></span>
+                    <h3 class="h5 mt-1">Mam problem w swoim otoczeniu</h3>
+                    <p class="mb-0 text-muted">Opisz sytuację własnymi słowami. Pokażemy, czy ktoś już nad tym pracuje i jakie rozwiązania istnieją.</p>
                 </div>
-            </div>
+            </a>
         </div>
-        <div class="col-md-4">
-            <div class="card h-100 border-success">
+        }
+        @if (czyAutor)
+        {
+        <div class="col-md-6 col-lg-4">
+            <a class="card ws-card-link ws-tile" asp-page="/Kreator/Rodzaj">
                 <div class="card-body">
-                    <h3 class="h5">Mam problem w moim otoczeniu</h3>
-                    <p>Opisz sytuację własnymi słowami — pokażemy, czy ktoś już nad tym pracuje.</p>
-                    <a class="btn btn-success" asp-page="/Problemy/Zglos">Zgłoś problem</a>
+                    <span class="ws-tile-icon"><i class="bi bi-lightbulb" aria-hidden="true"></i></span>
+                    <h3 class="h5 mt-1">Mam pomysł na innowację</h3>
+                    <p class="mb-0 text-muted">Kreator z asystentem AI poprowadzi Cię od fiszki po wniosek o finansowanie.</p>
                 </div>
-            </div>
+            </a>
         </div>
-        <div class="col-md-4">
-            <div class="card h-100">
+        }
+        <div class="col-md-6 col-lg-4">
+            <a class="card ws-card-link ws-tile" asp-page="/Biblioteka/Index">
                 <div class="card-body">
-                    <h3 class="h5">Chcę pomóc</h3>
-                    <p>Przeglądaj pomysły, popieraj je, zgłaszaj się do testów.</p>
-                    <a class="btn btn-outline-primary" asp-page="/Publiczne/DoTestowania">Zobacz innowacje</a>
+                    <span class="ws-tile-icon is-success"><i class="bi bi-journal-bookmark" aria-hidden="true"></i></span>
+                    <h3 class="h5 mt-1">Szukam sprawdzonych rozwiązań</h3>
+                    <p class="mb-0 text-muted">Biblioteka innowacji, dobrych praktyk, raportów i materiałów edukacyjnych.</p>
                 </div>
-            </div>
+            </a>
         </div>
-        <div class="col-md-4">
-            <div class="card h-100">
+        @if (mozeTestowac)
+        {
+        <div class="col-md-6 col-lg-4">
+            <a class="card ws-card-link ws-tile" asp-page="/Publiczne/DoTestowania">
                 <div class="card-body">
-                    <h3 class="h5">Pracuję w ROPS</h3>
-                    <p>Zweryfikuj fiszki, utwórz nabór, oceniaj wnioski.</p>
-                    <a class="btn btn-outline-primary" asp-page="/Rops/Weryfikacja">Panel ROPS</a>
+                    <span class="ws-tile-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
+                    <h3 class="h5 mt-1">Chcę pomóc i testować</h3>
+                    <p class="mb-0 text-muted">Popieraj pomysły, komentuj i zgłoś się jako tester innowacji.</p>
                 </div>
-            </div>
+            </a>
+        </div>
+        }
+        @if (czyInstytucja)
+        {
+        <div class="col-md-6 col-lg-4">
+            <a class="card ws-card-link ws-tile" asp-page="/Biblioteka/Index">
+                <div class="card-body">
+                    <span class="ws-tile-icon is-success"><i class="bi bi-building" aria-hidden="true"></i></span>
+                    <h3 class="h5 mt-1">Wdrażam w instytucji</h3>
+                    <p class="mb-0 text-muted">Wybierz sprawdzoną innowację i dostosuj ją do swojej gminy, CUS lub organizacji (Middleman).</p>
+                </div>
+            </a>
+        </div>
+        }
+        @if (czyRops)
+        {
+        <div class="col-md-6 col-lg-4">
+            <a class="card ws-card-link ws-tile" asp-page="/Rops/Panel">
+                <div class="card-body">
+                    <span class="ws-tile-icon"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
+                    <h3 class="h5 mt-1">Pracuję w ROPS</h3>
+                    <p class="mb-0 text-muted">Panel z kolejkami: problemy, luki, fiszki, nabory, wnioski i testy.</p>
+                </div>
+            </a>
+        </div>
+        }
+    </div>
+</section>
+
+<section class="mb-4" aria-labelledby="jak-h">
+    <h2 id="jak-h" class="h3 mb-3">Jak to działa</h2>
+    <div class="card">
+        <div class="card-body p-4">
+            <ol class="ws-steps row row-cols-1 row-cols-md-2 g-4">
+                <li class="col"><strong>Autor</strong> opisuje pomysł w kreatorze. Asystent AI pomaga doprecyzować.</li>
+                <li class="col">System porównuje pomysł z <strong>Biblioteką Innowacji Społecznych</strong> i podobnymi zgłoszeniami.</li>
+                <li class="col">Fiszkę weryfikuje <strong>pracownik ROPS</strong>. Po akceptacji trafia na publiczną kartę.</li>
+                <li class="col"><strong>Mieszkańcy</strong> popierają, komentują i zgłaszają chęć testowania.</li>
+                <li class="col">Autor składa <strong>wniosek</strong> w naborze ROPS i testuje rozwiązanie z zainteresowanymi.</li>
+                <li class="col">Sprawdzona innowacja wraca do Biblioteki jako gotowe rozwiązanie dla innych.</li>
+            </ol>
         </div>
     </div>
 </section>

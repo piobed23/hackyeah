@@ -25,7 +25,11 @@ public class Program
             opt.IdleTimeout = TimeSpan.FromHours(8);
         });
 
-        builder.Services.AddAuthentication("demo").AddCookie("demo");
+        builder.Services.AddAuthentication("demo").AddCookie("demo", o =>
+        {
+            o.AccessDeniedPath = "/BrakDostepu";
+            o.LoginPath = "/BrakDostepu";
+        });
         builder.Services.AddAuthorization(opt =>
         {
             opt.AddPolicy("RolaROPS", p => p.RequireRole("PracownikROPS", "Admin"));
@@ -33,6 +37,9 @@ public class Program
             opt.AddPolicy("RolaAdmin", p => p.RequireRole("Admin"));
             opt.AddPolicy("RolaEkspert", p => p.RequireRole("Ekspert", "Admin"));
             opt.AddPolicy("RolaInstytucja", p => p.RequireRole("Instytucja", "Admin"));
+            opt.AddPolicy("RolaWnioskodawca", p => p.RequireRole("Autor", "Instytucja", "Admin"));
+            opt.AddPolicy("ZglaszanieProblemu", p => p.RequireRole("Mieszkaniec", "Autor", "Instytucja", "Admin"));
+            opt.AddPolicy("ProponowanieMaterialu", p => p.RequireRole("Mieszkaniec", "Autor", "Instytucja", "Ekspert", "Admin"));
         });
 
         builder.Services.AddRazorPages()
@@ -40,10 +47,14 @@ public class Program
             {
                 o.Conventions.AuthorizeFolder("/Rops", "RolaROPS");
                 o.Conventions.AuthorizeFolder("/Autor", "RolaAutor");
-                o.Conventions.AuthorizeFolder("/Wnioski", "RolaAutor");
+                o.Conventions.AuthorizeFolder("/Wnioski", "RolaWnioskodawca");
                 o.Conventions.AuthorizeFolder("/Kreator", "RolaAutor");
                 o.Conventions.AuthorizeFolder("/Moje", "RolaAutor");
                 o.Conventions.AuthorizeFolder("/Middleman", "RolaInstytucja");
+                o.Conventions.AuthorizeFolder("/Ekspert", "RolaEkspert");
+                o.Conventions.AuthorizePage("/Problemy/Zglos", "ZglaszanieProblemu");
+                o.Conventions.AuthorizePage("/Problemy/Moje", "ZglaszanieProblemu");
+                o.Conventions.AuthorizePage("/Biblioteka/Dodaj", "ProponowanieMaterialu");
                 o.Conventions.AuthorizeFolder("/Admin", "RolaAdmin");
             });
 

@@ -1,5 +1,6 @@
 using App.Data;
 using App.Data.Entities;
+using App.Infrastructure.Auth;
 using App.Infrastructure.Enums;
 using App.Services.Context;
 using Microsoft.AspNetCore.Authorization;
@@ -52,6 +53,7 @@ public class KartaModel : PageModel
     {
         var user = _auth.GetUser();
         if (user is null) return Unauthorized();
+        if (!Uprawnienia.MozeGlosowacIKomentowac(_auth.GetRola())) return Forbid();
 
         var ist = await _db.Endorsements.FirstOrDefaultAsync(e => e.IdeaId == Id && e.UzytkownikId == user.Id);
         if (ist is null)
@@ -67,6 +69,7 @@ public class KartaModel : PageModel
     {
         var user = _auth.GetUser();
         if (user is null) return Unauthorized();
+        if (!Uprawnienia.MozeGlosowacIKomentowac(_auth.GetRola())) return Forbid();
 
         if (!string.IsNullOrWhiteSpace(NowyKomentarz))
         {
@@ -85,6 +88,7 @@ public class KartaModel : PageModel
     {
         var user = _auth.GetUser();
         if (user is null) return Unauthorized();
+        if (!Uprawnienia.MozeGlosowacIKomentowac(_auth.GetRola())) return Forbid();
 
         var sesja = await _db.TestSessions
             .FirstOrDefaultAsync(t => t.IdeaId == Id && (t.Status == StatusSesjiTestowej.PoszukujeTesterow || t.Status == StatusSesjiTestowej.WTrakcie));
@@ -118,6 +122,7 @@ public class KartaModel : PageModel
     {
         var user = _auth.GetUser();
         if (user is null) return Unauthorized();
+        if (!Uprawnienia.MozeSkladacOferte(_auth.GetRola())) return Forbid();
 
         if (!string.IsNullOrWhiteSpace(TypOferty) && !string.IsNullOrWhiteSpace(OpisOferty))
         {

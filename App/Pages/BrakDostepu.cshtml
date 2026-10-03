@@ -1,0 +1,23 @@
+@page
+@model BrakDostepuModel
+@{
+    ViewData["Title"] = "Brak dostępu";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-body p-4 text-center">
+                <p class="display-5 text-primary mb-2" aria-hidden="true"><i class="bi bi-shield-lock"></i></p>
+                <h1 class="h3">Ta strona jest przeznaczona dla innej roli</h1>
+                <p class="mb-3">
+                    Aktualnie działasz jako <strong>@Model.NazwaRoli</strong>. @Model.Opis
+                </p>
+                <p class="text-muted small mb-4">
+                    W trybie demonstracyjnym możesz zmienić rolę w pasku u góry strony (lista „Rola"), aby zobaczyć widoki innych użytkowników.
+                </p>
+                <a class="btn btn-primary" asp-page="/Index"><i class="bi bi-house" aria-hidden="true"></i> Wróć na stronę startową</a>
+            </div>
+        </div>
+    </div>
+</div>
