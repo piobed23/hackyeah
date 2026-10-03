@@ -1,0 +1,119 @@
+@page
+@using App.Infrastructure.Enums
+@model App.Pages.Wnioski.HarmonogramModel
+@{
+    ViewData["Title"] = "Plan działania i koszty";
+    var oknoOd = Model.Wniosek.Call.DataOtwarcia.ToString("yyyy-MM-dd");
+    var oknoDo = Model.Wniosek.Call.DataZamkniecia.ToString("yyyy-MM-dd");
+    var okresy = new[]
+    {
+        (Okres: OkresPlanu.Przygotowawczy, Naglowek: "Okres przygotowawczy (max 3 msc)"),
+        (Okres: OkresPlanu.TestFaza1,      Naglowek: "Okres testowania — Faza I"),
+        (Okres: OkresPlanu.TestFaza2,      Naglowek: "Okres testowania — Faza II")
+    };
+}
+
+<h1>9. Plan działania i koszty</h1>
+<p class="text-muted small">
+    Nabór: @Model.Wniosek.Call.Nazwa · okno naboru: @oknoOd – @oknoDo
+    · Okres przygotowawczy max 3 miesiące, okres testowania max 9 miesięcy.
+</p>
+
+@await Html.PartialAsync("_WniosekMenu", (Model.Id, "harmonogram"))
+
+@foreach (var (okres, naglowek) in okresy)
+{
+    var pozycje = Model.Wniosek.Harmonogram.Where(h => h.Okres == okres).OrderBy(h => h.Lp).ToList();
+    <section class="my-4" aria-labelledby="h-@okres">
+        <h2 id="h-@okres" class="h6">@naglowek</h2>
+        @if (pozycje.Count == 0)
+        {
+            <p class="text-muted small">Brak pozycji — dodaj poniżej.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Lp.</th>
+                            <th>Działanie</th>
+                            <th>Termin od</th>
+                            <th>Termin do</th>
+                            <th>Rezultat</th>
+                            <th class="text-end">Koszt</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var h in pozycje)
+                    {
+                        <tr>
+                            <td>@h.Lp</td>
+                            <td>@h.NazwaZadania</td>
+                            <td>@h.Od.ToString("yyyy-MM-dd")</td>
+                            <td>@h.Do.ToString("yyyy-MM-dd")</td>
+                            <td class="small">@h.Rezultat</td>
+                            <td class="text-end">@h.KosztDzialania.ToString("C")</td>
+                            <td class="text-end">
+                                <form method="post" asp-page-handler="Usun" asp-route-id="@Model.Id" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="pozycjaId" value="@h.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Usuń @h.NazwaZadania">Usuń</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                    <tfoot>
+                        <tr class="fw-semibold">
+                            <td colspan="5" class="text-end">Suma:</td>
+                            <td class="text-end">@pozycje.Sum(p => p.KosztDzialania).ToString("C")</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    </section>
+}
+
+<section class="my-4">
+    <h2 class="h6">Dodaj pozycję planu</h2>
+    <form method="post" asp-page-handler="Dodaj" asp-route-id="@Model.Id" class="row g-2">
+        @Html.AntiForgeryToken()
+        <div class="col-md-3">
+            <label for="okres" class="form-label">Okres</label>
+            <select id="okres" name="NowaPozycja.Okres" class="form-select" required>
+                <option value="Przygotowawczy">Okres przygotowawczy</option>
+                <option value="TestFaza1">Testowanie — Faza I</option>
+                <option value="TestFaza2">Testowanie — Faza II</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="nazwa" class="form-label">Działanie</label>
+            <input id="nazwa" name="NowaPozycja.NazwaZadania" class="form-control" required maxlength="200" />
+        </div>
+        <div class="col-md-2">
+            <label for="od" class="form-label">Od</label>
+            <input id="od" name="NowaPozycja.Od" type="date" class="form-control" required min="@oknoOd" max="@oknoDo" />
+        </div>
+        <div class="col-md-2">
+            <label for="do" class="form-label">Do</label>
+            <input id="do" name="NowaPozycja.Do" type="date" class="form-control" required min="@oknoOd" max="@oknoDo" />
+        </div>
+        <div class="col-md-1">
+            <label for="koszt" class="form-label">Koszt</label>
+            <input id="koszt" name="NowaPozycja.KosztDzialania" type="number" step="0.01" min="0" value="0" class="form-control" />
+        </div>
+        <div class="col-12">
+            <label for="rezultat" class="form-label">Rezultat</label>
+            <input id="rezultat" name="NowaPozycja.Rezultat" class="form-control" maxlength="500" />
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Dodaj pozycję</button>
+            <a class="btn btn-outline-secondary" asp-page="/Wnioski/Budzet" asp-route-id="@Model.Id">Budżet szczegółowy</a>
+            <a class="btn btn-outline-secondary" asp-page="/Wnioski/Kompletnosc" asp-route-id="@Model.Id">Kompletność</a>
+        </div>
+    </form>
+</section>

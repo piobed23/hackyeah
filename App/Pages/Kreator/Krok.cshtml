@@ -1,0 +1,219 @@
+@page
+@model App.Pages.Kreator.KrokModel
+@{
+    ViewData["Title"] = $"Kreator — krok {Model.Krok} z {App.Pages.Kreator.KrokModel.LacznieKrokow}";
+    var etykieta = Model.Krok <= App.Pages.Kreator.KrokModel.Etykiety.Length
+        ? App.Pages.Kreator.KrokModel.Etykiety[Model.Krok - 1]
+        : $"Krok {Model.Krok}";
+}
+
+@await Html.PartialAsync("_StepProgress", (Model.Krok, App.Pages.Kreator.KrokModel.LacznieKrokow, App.Pages.Kreator.KrokModel.Etykiety, Model.Id))
+
+<h1 id="krok-heading" tabindex="-1">Krok @Model.Krok z @App.Pages.Kreator.KrokModel.LacznieKrokow: @etykieta</h1>
+
+@if (!string.IsNullOrEmpty(Model.KomunikatZapisu))
+{
+    <div class="alert alert-success py-2" role="status" aria-live="polite">@Model.KomunikatZapisu</div>
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert" aria-live="assertive">
+        <strong>Formularz zawiera błędy:</strong>
+        <ul class="mb-0">
+        @foreach (var k in ViewData.ModelState)
+        {
+            foreach (var e in k.Value!.Errors)
+            {
+                <li>@(string.IsNullOrEmpty(k.Key) ? "" : k.Key.Replace("Karta.", "") + ": ")@e.ErrorMessage</li>
+            }
+        }
+        </ul>
+    </div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <form method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="Krok" />
+
+            @switch (Model.Krok)
+            {
+                case 1:
+                    <div class="mb-3">
+                        <label asp-for="Karta.Tytul" class="form-label">Tytuł pomysłu</label>
+                        <input asp-for="Karta.Tytul" class="form-control" required aria-describedby="help-tytul" autofocus />
+                        <div id="help-tytul" class="form-text">Zwięzły, komunikatywny tytuł. Co to jest i dla kogo.</div>
+                        <span asp-validation-for="Karta.Tytul" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Karta.Streszczenie" class="form-label">Streszczenie (1-3 zdania)</label>
+                        <textarea asp-for="Karta.Streszczenie" class="form-control" rows="3" aria-describedby="help-strez"></textarea>
+                        <div id="help-strez" class="form-text">Co jest Twoim pomysłem — tak, aby zrozumiał to ktoś spoza projektu.</div>
+                    </div>
+                    break;
+
+                case 2:
+                    <div class="mb-3">
+                        <label asp-for="Karta.Problem" class="form-label">Opis problemu</label>
+                        <textarea asp-for="Karta.Problem" class="form-control" rows="5" required aria-describedby="help-prob" autofocus></textarea>
+                        <div id="help-prob" class="form-text">Jaki problem rozwiązujesz? Kogo dotyczy, gdzie, skąd o nim wiesz?</div>
+                        <span asp-validation-for="Karta.Problem" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Karta.GrupaDocelowa" class="form-label">Grupa docelowa</label>
+                        <textarea asp-for="Karta.GrupaDocelowa" class="form-control" rows="3" aria-describedby="help-grupa"></textarea>
+                        <div id="help-grupa" class="form-text">Ile osób, wiek, miejsce, sytuacja życiowa.</div>
+                    </div>
+                    @if (!string.IsNullOrWhiteSpace(Model.Karta.Problem))
+                    {
+                        <div class="alert alert-info d-flex justify-content-between align-items-center">
+                            <span>Sprawdź, czy istnieje już podobne rozwiązanie.</span>
+                            <a class="btn btn-sm btn-outline-primary" asp-page="/Kreator/Podobne" asp-route-id="@Model.Id">Zobacz podobne</a>
+                        </div>
+                    }
+                    break;
+
+                case 3:
+                    <div class="mb-3">
+                        <label asp-for="Karta.Rozwiazanie" class="form-label">Rozwiązanie</label>
+                        <textarea asp-for="Karta.Rozwiazanie" class="form-control" rows="5" required aria-describedby="help-rozw" autofocus></textarea>
+                        <div id="help-rozw" class="form-text">Co proponujesz? Co jest w tym nowego lub lepszego niż istniejące próby?</div>
+                        <span asp-validation-for="Karta.Rozwiazanie" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Karta.SposobDzialania" class="form-label">Sposób działania</label>
+                        <textarea asp-for="Karta.SposobDzialania" class="form-control" rows="4" aria-describedby="help-spos"></textarea>
+                        <div id="help-spos" class="form-text">Krok po kroku: jak dociera do odbiorcy, jak działa, jak kończy się udział.</div>
+                    </div>
+                    break;
+
+                case 4:
+                    <div class="mb-3">
+                        <label asp-for="Karta.Rezultaty" class="form-label">Spodziewane rezultaty</label>
+                        <textarea asp-for="Karta.Rezultaty" class="form-control" rows="5" aria-describedby="help-rez" autofocus></textarea>
+                        <div id="help-rez" class="form-text">Mierzalne wyniki — liczby, procenty, czasy. Jak je zmierzysz?</div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Karta.Obszar" class="form-label">Obszar działania</label>
+                        <input asp-for="Karta.Obszar" class="form-control" aria-describedby="help-obsz" />
+                        <div id="help-obsz" class="form-text">Gmina, powiat, region, cała Małopolska — gdzie planujesz działać.</div>
+                    </div>
+                    break;
+
+                case 5:
+                    <div class="mb-3">
+                        <label asp-for="Karta.Zasoby" class="form-label">Potrzebne zasoby</label>
+                        <textarea asp-for="Karta.Zasoby" class="form-control" rows="4" aria-describedby="help-zas" autofocus></textarea>
+                        <div id="help-zas" class="form-text">Ludzie, lokal, sprzęt, finanse. Co jest konieczne żeby ruszyć.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Karta.PosiadaneZasoby" class="form-label">Co już masz</label>
+                        <textarea asp-for="Karta.PosiadaneZasoby" class="form-control" rows="3" aria-describedby="help-pzas"></textarea>
+                        <div id="help-pzas" class="form-text">Partnerzy, przestrzeń, kompetencje — czym startujesz dziś.</div>
+                    </div>
+                    break;
+
+                case 6:
+                    <div class="mb-3">
+                        <label asp-for="Karta.Ryzyka" class="form-label">Ryzyka i jak im zapobiegasz</label>
+                        <textarea asp-for="Karta.Ryzyka" class="form-control" rows="5" aria-describedby="help-ryz" autofocus></textarea>
+                        <div id="help-ryz" class="form-text">Dla każdego ryzyka — plan ograniczenia lub plan B.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Karta.Tagi" class="form-label">Tagi (po przecinku)</label>
+                        <input asp-for="Karta.Tagi" class="form-control" aria-describedby="help-tagi" />
+                        <div id="help-tagi" class="form-text">Np. seniorzy, zdrowie, dostępność, wieś. Ułatwiają wyszukiwanie i porównania.</div>
+                    </div>
+                    break;
+
+                case 7:
+                    <h2 class="h5">Zweryfikuj fiszkę przed wysłaniem</h2>
+                    <dl class="row small">
+                        <dt class="col-sm-3">Tytuł</dt><dd class="col-sm-9">@Model.Karta.Tytul</dd>
+                        <dt class="col-sm-3">Streszczenie</dt><dd class="col-sm-9">@Model.Karta.Streszczenie</dd>
+                        <dt class="col-sm-3">Problem</dt><dd class="col-sm-9">@Model.Karta.Problem</dd>
+                        <dt class="col-sm-3">Grupa docelowa</dt><dd class="col-sm-9">@Model.Karta.GrupaDocelowa</dd>
+                        <dt class="col-sm-3">Rozwiązanie</dt><dd class="col-sm-9">@Model.Karta.Rozwiazanie</dd>
+                        <dt class="col-sm-3">Rezultaty</dt><dd class="col-sm-9">@Model.Karta.Rezultaty</dd>
+                        <dt class="col-sm-3">Ryzyka</dt><dd class="col-sm-9">@Model.Karta.Ryzyka</dd>
+                        <dt class="col-sm-3">Tagi</dt><dd class="col-sm-9">@Model.Karta.Tagi</dd>
+                    </dl>
+                    <div class="mb-3">
+                        <label asp-for="Karta.PodsumowanieAI" class="form-label">Krótkie podsumowanie dla czytelnika</label>
+                        <textarea asp-for="Karta.PodsumowanieAI" class="form-control" rows="3" aria-describedby="help-pod" autofocus></textarea>
+                        <div id="help-pod" class="form-text">To zobaczy mieszkaniec na publicznej karcie pomysłu.</div>
+                    </div>
+
+                    @if (Model.Kompletnosc is not null)
+                    {
+                        <div class="my-3">
+                            <label class="form-label">Kompletność fiszki: @Model.Kompletnosc.Procent%</label>
+                            <div class="progress" role="progressbar" aria-valuenow="@Model.Kompletnosc.Procent" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar @(Model.Kompletnosc.CanSubmit ? "bg-success" : "bg-warning")" style="width: @Model.Kompletnosc.Procent%"></div>
+                            </div>
+                            @if (Model.Kompletnosc.Braki.Count > 0)
+                            {
+                                <details class="mt-2">
+                                    <summary>Brakuje @Model.Kompletnosc.Braki.Count pól</summary>
+                                    <ul class="small">
+                                        @foreach (var b in Model.Kompletnosc.Braki)
+                                        {
+                                            <li><strong>@b.Etykieta</strong> — @b.Opis</li>
+                                        }
+                                    </ul>
+                                </details>
+                            }
+                        </div>
+                    }
+                    break;
+            }
+
+            <div class="d-flex gap-2 mt-4 flex-wrap">
+                <button type="submit" name="akcja" value="Zapisz" class="btn btn-outline-secondary">Zapisz szkic</button>
+                @if (Model.Krok > 1)
+                {
+                    <button type="submit" name="akcja" value="Wstecz" class="btn btn-outline-primary">Wstecz</button>
+                }
+                @if (Model.Krok < App.Pages.Kreator.KrokModel.LacznieKrokow)
+                {
+                    <button type="submit" name="akcja" value="Dalej" class="btn btn-primary">Dalej</button>
+                }
+                else
+                {
+                    <button type="submit" name="akcja" value="Wyslij" class="btn btn-success">Wyślij do weryfikacji ROPS</button>
+                }
+                <a class="btn btn-link ms-auto" asp-page="/Moje/Index">Anuluj i wróć</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-lg-4">
+        @await Html.PartialAsync("_AiPanel", Model.Sugestia)
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var h = document.getElementById('krok-heading');
+            if (h) h.focus();
+
+            document.addEventListener('keydown', function (e) {
+                if (!e.altKey) return;
+                var form = document.querySelector('form');
+                if (!form) return;
+                if (e.key === 'ArrowRight') {
+                    var dalej = form.querySelector('button[value="Dalej"], button[value="Wyslij"]');
+                    if (dalej) { e.preventDefault(); dalej.click(); }
+                }
+                if (e.key === 'ArrowLeft') {
+                    var wstecz = form.querySelector('button[value="Wstecz"]');
+                    if (wstecz) { e.preventDefault(); wstecz.click(); }
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,29 @@
+@model (int Aktualny, int Lacznie, string[] Etykiety, int IdeaId)
+<nav aria-label="Postęp kreatora" class="mb-4">
+    <ol class="list-unstyled d-flex flex-wrap gap-2 small">
+        @for (int i = 1; i <= Model.Lacznie; i++)
+        {
+            var etykieta = i <= Model.Etykiety.Length ? Model.Etykiety[i - 1] : $"Krok {i}";
+            if (i == Model.Aktualny)
+            {
+                <li aria-current="step">
+                    <span class="badge bg-primary">Krok @i z @Model.Lacznie: @etykieta</span>
+                </li>
+            }
+            else if (i < Model.Aktualny)
+            {
+                <li>
+                    <a class="badge bg-success text-decoration-none" asp-page="/Kreator/Krok" asp-route-id="@Model.IdeaId" asp-route-krok="@i">
+                        <span class="visually-hidden">Zrealizowany krok</span>@i. @etykieta
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li>
+                    <span class="badge bg-light text-dark border" aria-disabled="true">@i. @etykieta</span>
+                </li>
+            }
+        }
+    </ol>
+</nav>

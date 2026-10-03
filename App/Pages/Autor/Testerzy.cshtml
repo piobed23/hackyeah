@@ -1,0 +1,166 @@
+@page
+@model App.Pages.Autor.TesterzyModel
+@{
+    ViewData["Title"] = "Testerzy — " + (Model.Idea.Karta?.Tytul ?? "");
+    var s = Model.Sesja;
+}
+
+<nav aria-label="okruszki" class="mb-2">
+    <a asp-page="/Autor/Innowacja" asp-route-id="@Model.IdeaId" class="small">← Panel innowacji</a>
+</nav>
+
+<h1>Testerzy — @Model.Idea.Karta?.Tytul</h1>
+
+@if (s is null)
+{
+    <div class="alert alert-info">
+        Jeszcze nie rozpocząłeś/aś sesji testowej.
+        <a asp-page="/Autor/Innowacja" asp-route-id="@Model.IdeaId">Rozpocznij testowanie</a>.
+    </div>
+    return;
+}
+
+<p class="text-muted small">Sesja testowa: @s.Status @if (s.Termin is not null) { <span>· termin: @s.Termin:yyyy-MM-dd</span> }</p>
+
+<section class="row g-3 my-3" aria-label="Statystyki">
+    <div class="col-6 col-md-3"><div class="card"><div class="card-body text-center"><p class="h4 mb-0">@Model.Zgloszenia</p><p class="small text-muted mb-0">Zgłoszenia</p></div></div></div>
+    <div class="col-6 col-md-3"><div class="card"><div class="card-body text-center"><p class="h4 mb-0">@Model.Przyjeci</p><p class="small text-muted mb-0">Przyjęci</p></div></div></div>
+    <div class="col-6 col-md-3"><div class="card"><div class="card-body text-center"><p class="h4 mb-0">@Model.Zakonczone</p><p class="small text-muted mb-0">Zakończone testy</p></div></div></div>
+    <div class="col-6 col-md-3"><div class="card"><div class="card-body text-center"><p class="h4 mb-0">@Model.SredniaOcena.ToString("0.#")/5</p><p class="small text-muted mb-0">Śr. ocena</p></div></div></div>
+</section>
+
+<section class="my-4" aria-labelledby="lista">
+    <h2 id="lista" class="h5">Zgłoszenia</h2>
+    @if (s.Zgloszenia.Count == 0)
+    {
+        <p class="text-muted">Jeszcze nikt się nie zgłosił. Udostępnij <a asp-page="/Publiczne/Karta" asp-route-id="@Model.IdeaId">publiczną kartę</a> znajomym i mieszkańcom.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <caption class="visually-hidden">Lista zgłoszeń testerów</caption>
+                <thead>
+                    <tr>
+                        <th>Osoba</th>
+                        <th>Data</th>
+                        <th>Informacja</th>
+                        <th>Kontakt</th>
+                        <th>Status</th>
+                        <th>Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var z in s.Zgloszenia.OrderByDescending(x => x.KiedyUtc))
+                {
+                    <tr>
+                        <td><strong>@z.ImieLubProfil</strong></td>
+                        <td class="small">@z.KiedyUtc.ToLocalTime():yyyy-MM-dd HH:mm</td>
+                        <td class="small">
+                            @if (!string.IsNullOrEmpty(z.Powod)) { <p class="mb-1">@z.Powod</p> }
+                            @if (!string.IsNullOrEmpty(z.PotrzebneUdogodnienia)) { <p class="mb-0 text-warning"><strong>Udogodnienia:</strong> @z.PotrzebneUdogodnienia</p> }
+                        </td>
+                        <td class="small">
+                            @if (z.ZgodaNaPrzekazanieDanych) { @z.PreferowanyKontakt }
+                            else { <em class="text-muted">brak zgody na przekazanie</em> }
+                        </td>
+                        <td><span class="badge bg-light text-dark border">@z.Status</span></td>
+                        <td>
+                            @if (z.Status == App.Infrastructure.Enums.StatusTestera.Nowe)
+                            {
+                                <details>
+                                    <summary class="btn btn-sm btn-success">Akceptuj</summary>
+                                    <form method="post" asp-page-handler="Akceptuj" class="mt-2">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="zgloszenieId" value="@z.Id" />
+                                        <textarea name="wiadomosc" class="form-control form-control-sm" rows="3" required placeholder="Termin, miejsce / link, jak przekazać opinię" maxlength="2000"></textarea>
+                                        <button type="submit" class="btn btn-sm btn-primary mt-1">Wyślij instrukcję</button>
+                                    </form>
+                                </details>
+                                <form method="post" asp-page-handler="Odrzuc" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="zgloszenieId" value="@z.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Odrzuć</button>
+                                </form>
+                            }
+                            else if (z.Status == App.Infrastructure.Enums.StatusTestera.Przyjety)
+                            {
+                                <form method="post" asp-page-handler="PoprosOpinie" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="zgloszenieId" value="@z.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Test wykonany — poproś o opinię</button>
+                                </form>
+                                <p class="small text-muted mt-1">Link do opinii: <code>/Testerzy/Opinia?zgloszenie=@z.Id</code></p>
+                            }
+                            else if (z.Status == App.Infrastructure.Enums.StatusTestera.TestWykonany)
+                            {
+                                <p class="small text-muted mb-0">Oczekuje opinii. Link: <code>/Testerzy/Opinia?zgloszenie=@z.Id</code></p>
+                            }
+                            else if (z.Opinia is not null)
+                            {
+                                <details>
+                                    <summary>Opinia (ocena @z.Opinia.OcenaOgolna/5)</summary>
+                                    <dl class="small mt-2">
+                                        <dt>Odpowiada na problem?</dt><dd>@(z.Opinia.OdpowiadaNaProblem ? "Tak" : "Nie")</dd>
+                                        <dt>Łatwość (1-5)</dt><dd>@z.Opinia.Latwosc</dd>
+                                        <dt>Co działało</dt><dd>@z.Opinia.CoDzialaloDobrze</dd>
+                                        <dt>Do poprawy</dt><dd>@z.Opinia.DoPoprawy</dd>
+                                        <dt>Skorzystałby ponownie?</dt><dd>@(z.Opinia.SkorzystalbysPonownie ? "Tak" : "Nie")</dd>
+                                        @if (!string.IsNullOrEmpty(z.Opinia.BariereDostepnosci)) { <dt>Bariery dostępności</dt><dd class="text-warning">@z.Opinia.BariereDostepnosci</dd> }
+                                    </dl>
+                                </details>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
+
+@if (s.Zgloszenia.Any(z => z.Opinia is not null))
+{
+    <section class="my-4" aria-labelledby="wyniki">
+        <h2 id="wyniki" class="h5">Podsumowanie wyników</h2>
+        @{
+            var opinie = s.Zgloszenia.Where(z => z.Opinia is not null).Select(z => z.Opinia!).ToList();
+            var bariery = opinie.Where(o => !string.IsNullOrWhiteSpace(o.BariereDostepnosci)).Select(o => o.BariereDostepnosci).ToList();
+            var poprawki = opinie.Where(o => !string.IsNullOrWhiteSpace(o.DoPoprawy)).Select(o => o.DoPoprawy).ToList();
+        }
+        <ul>
+            <li>Odpowiada na problem: @opinie.Count(o => o.OdpowiadaNaProblem)/@opinie.Count osób</li>
+            <li>Chciałoby skorzystać ponownie: @opinie.Count(o => o.SkorzystalbysPonownie)/@opinie.Count osób</li>
+            <li>Średnia łatwość użycia: @(opinie.Average(o => o.Latwosc).ToString("0.#"))/5</li>
+        </ul>
+        @if (bariery.Count > 0)
+        {
+            <h3 class="h6 text-warning">Zgłoszone bariery dostępności</h3>
+            <ul>@foreach (var b in bariery) { <li>@b</li> }</ul>
+        }
+        @if (poprawki.Count > 0)
+        {
+            <h3 class="h6">Najczęstsze sugestie poprawek</h3>
+            <ul>@foreach (var p in poprawki) { <li>@p</li> }</ul>
+        }
+    </section>
+}
+
+@if (s.Status == App.Infrastructure.Enums.StatusSesjiTestowej.WTrakcie || s.Status == App.Infrastructure.Enums.StatusSesjiTestowej.WPoprawie)
+{
+    <section class="my-4" aria-labelledby="zakoncz">
+        <h2 id="zakoncz" class="h5">Co dalej z testowaniem?</h2>
+        <form method="post" asp-page-handler="Zakoncz" class="d-flex gap-2 flex-wrap">
+            @Html.AntiForgeryToken()
+            <button type="submit" name="akcja" value="WPoprawie" class="btn btn-outline-warning">Wprowadzam poprawki</button>
+            <button type="submit" name="akcja" value="KolejniTesterzy" class="btn btn-outline-primary">Potrzebuję kolejnych testerów</button>
+            <button type="submit" name="akcja" value="Zakoncz" class="btn btn-outline-success">Zakończ testowanie — przekaż do ROPS</button>
+        </form>
+    </section>
+}
+else if (s.Status == App.Infrastructure.Enums.StatusSesjiTestowej.Zakonczone)
+{
+    <div class="alert alert-info">
+        Testy zakończone. Oczekuje na zatwierdzenie przez ROPS jako „sprawdzona innowacja".
+    </div>
+}

@@ -1,0 +1,35 @@
+@model (int Id, string Aktywna)
+<nav aria-label="Sekcje wniosku" class="mb-4">
+    <ul class="nav nav-pills gap-1 flex-wrap">
+        <li class="nav-item">
+            <a class="nav-link @(Model.Aktywna == "opis" ? "active" : "")"
+               aria-current="@(Model.Aktywna == "opis" ? "page" : null)"
+               asp-page="/Wnioski/Edycja" asp-route-id="@Model.Id">Opis</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(Model.Aktywna == "budzet" ? "active" : "")"
+               aria-current="@(Model.Aktywna == "budzet" ? "page" : null)"
+               asp-page="/Wnioski/Budzet" asp-route-id="@Model.Id">Budżet</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(Model.Aktywna == "harmonogram" ? "active" : "")"
+               aria-current="@(Model.Aktywna == "harmonogram" ? "page" : null)"
+               asp-page="/Wnioski/Harmonogram" asp-route-id="@Model.Id">Harmonogram</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(Model.Aktywna == "kompletnosc" ? "active" : "")"
+               aria-current="@(Model.Aktywna == "kompletnosc" ? "page" : null)"
+               asp-page="/Wnioski/Kompletnosc" asp-route-id="@Model.Id">Kompletność</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(Model.Aktywna == "podglad" ? "active" : "")"
+               aria-current="@(Model.Aktywna == "podglad" ? "page" : null)"
+               asp-page="/Wnioski/Podglad" asp-route-id="@Model.Id">Podgląd i złożenie</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(Model.Aktywna == "status" ? "active" : "")"
+               aria-current="@(Model.Aktywna == "status" ? "page" : null)"
+               asp-page="/Wnioski/Status" asp-route-id="@Model.Id">Status</a>
+        </li>
+    </ul>
+</nav>

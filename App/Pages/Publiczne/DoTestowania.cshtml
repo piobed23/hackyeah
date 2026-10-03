@@ -1,0 +1,42 @@
+@page
+@model App.Pages.Publiczne.DoTestowaniaModel
+@{
+    ViewData["Title"] = "Innowacje do testowania";
+}
+
+<h1>Innowacje szukające testerów</h1>
+<p class="text-muted">Autorzy innowacji szukają osób, które pomogą sprawdzić ich rozwiązania w praktyce.</p>
+
+@if (Model.Sesje.Count == 0)
+{
+    <div class="alert alert-info mt-3">
+        Obecnie żadna innowacja nie szuka testerów. Zajrzyj później lub przeglądaj
+        <a asp-page="/Index">wszystkie pomysły</a>.
+    </div>
+}
+else
+{
+    <div class="row g-3 mt-2">
+    @foreach (var s in Model.Sesje)
+    {
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h5">@s.Idea.Karta!.Tytul</h2>
+                    <p class="small text-muted">
+                        @(s.Zdalny ? "Zdalny" : "Stacjonarny")
+                        @(s.Termin is not null ? $" · termin: {s.Termin:yyyy-MM-dd}" : "")
+                        @(string.IsNullOrEmpty(s.CzasTrwania) ? "" : $" · {s.CzasTrwania}")
+                    </p>
+                    <p>@s.CoBedzieTestowane</p>
+                    @if (!string.IsNullOrWhiteSpace(s.KogoSzukamy))
+                    {
+                        <p class="small"><strong>Kogo szukamy:</strong> @s.KogoSzukamy</p>
+                    }
+                    <a class="btn btn-outline-primary btn-sm" asp-page="/Publiczne/Karta" asp-route-id="@s.IdeaId">Zobacz innowację</a>
+                </div>
+            </div>
+        </div>
+    }
+    </div>
+}

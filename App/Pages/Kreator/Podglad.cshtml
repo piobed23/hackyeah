@@ -1,0 +1,75 @@
+@page
+@model App.Pages.Kreator.PodgladModel
+@{
+    ViewData["Title"] = "Podgląd fiszki";
+    var k = Model.Idea!.Karta!;
+}
+
+@if (Model.Wyslana)
+{
+    <div class="alert alert-success" role="status" aria-live="polite">
+        <strong>Fiszka wysłana do ROPS.</strong> Zostaniesz powiadomiony/-a o wyniku weryfikacji.
+    </div>
+}
+
+<nav aria-label="okruszki" class="mb-2">
+    <a asp-page="/Moje/Index" class="small">← Moje pomysły</a>
+</nav>
+
+<article>
+    <header class="mb-3">
+        <h1>@k.Tytul</h1>
+        <p class="mb-1">
+            <span class="badge @App.Pages.Kreator.PodgladModel.KlasaStatusu(k.Status)">
+                @App.Pages.Kreator.PodgladModel.NazwaStatusu(k.Status)
+            </span>
+            <span class="badge bg-light text-dark border">@Model.Idea.Rodzaj</span>
+            <span class="badge bg-light text-dark border">@Model.Idea.EtapInnowacji</span>
+        </p>
+        <p class="text-muted small">Autor: @Model.Idea.Autor.Imie @Model.Idea.Autor.Nazwisko · utworzono @Model.Idea.UtworzonoUtc.ToLocalTime():yyyy-MM-dd</p>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(k.Streszczenie))
+    {
+        <section class="my-3"><p class="lead">@k.Streszczenie</p></section>
+    }
+
+    <dl>
+        @if (!string.IsNullOrWhiteSpace(k.Problem)) { <dt>Problem</dt><dd>@k.Problem</dd> }
+        @if (!string.IsNullOrWhiteSpace(k.GrupaDocelowa)) { <dt>Grupa docelowa</dt><dd>@k.GrupaDocelowa</dd> }
+        @if (!string.IsNullOrWhiteSpace(k.Rozwiazanie)) { <dt>Rozwiązanie</dt><dd>@k.Rozwiazanie</dd> }
+        @if (!string.IsNullOrWhiteSpace(k.SposobDzialania)) { <dt>Sposób działania</dt><dd>@k.SposobDzialania</dd> }
+        @if (!string.IsNullOrWhiteSpace(k.Rezultaty)) { <dt>Rezultaty</dt><dd>@k.Rezultaty</dd> }
+        @if (!string.IsNullOrWhiteSpace(k.Obszar)) { <dt>Obszar</dt><dd>@k.Obszar</dd> }
+        @if (!string.IsNullOrWhiteSpace(k.Zasoby)) { <dt>Potrzebne zasoby</dt><dd>@k.Zasoby</dd> }
+        @if (!string.IsNullOrWhiteSpace(k.PosiadaneZasoby)) { <dt>Posiadane zasoby</dt><dd>@k.PosiadaneZasoby</dd> }
+        @if (!string.IsNullOrWhiteSpace(k.Ryzyka)) { <dt>Ryzyka</dt><dd>@k.Ryzyka</dd> }
+        @if (!string.IsNullOrWhiteSpace(k.Tagi)) {
+            <dt>Tagi</dt>
+            <dd>
+                @foreach (var t in k.Tagi.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                {
+                    <span class="badge bg-light text-dark border me-1">@t</span>
+                }
+            </dd>
+        }
+    </dl>
+
+    @if (Model.Kompletnosc is not null)
+    {
+        <section class="my-4">
+            <h2 class="h6">Kompletność fiszki: @Model.Kompletnosc.Procent%</h2>
+            <div class="progress" role="progressbar" aria-valuenow="@Model.Kompletnosc.Procent" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar @(Model.Kompletnosc.CanSubmit ? "bg-success" : "bg-warning")" style="width: @Model.Kompletnosc.Procent%"></div>
+            </div>
+        </section>
+    }
+</article>
+
+<div class="d-flex gap-2 mt-4">
+    @if (k.Status is StatusFiszki.Szkic or StatusFiszki.WymagaUzupelnienia)
+    {
+        <a class="btn btn-primary" asp-page="/Kreator/Krok" asp-route-id="@Model.Idea.Id" asp-route-krok="1">Edytuj fiszkę</a>
+    }
+    <a class="btn btn-outline-secondary" asp-page="/Moje/Index">Powrót</a>
+</div>

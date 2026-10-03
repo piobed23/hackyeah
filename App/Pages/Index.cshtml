@@ -1,10 +1,93 @@
-﻿@page
+@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Start";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="py-4">
+    <h1>Platforma Innowacji Społecznych ROPS Małopolska</h1>
+    <p class="lead">
+        Zgłaszaj pomysły, konsultuj z mieszkańcami, aplikuj o finansowanie i testuj rozwiązania —
+        wszystko w jednym miejscu.
+    </p>
+</section>
+
+<section class="row g-3 my-3" aria-label="Statystyki platformy">
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <p class="display-6 mb-0">@Model.LiczbaInnowacji</p>
+                <p class="text-muted small mb-0">pomysłów w systemie</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <p class="display-6 mb-0">@Model.LiczbaOpublikowanych</p>
+                <p class="text-muted small mb-0">opublikowanych fiszek</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <p class="display-6 mb-0">@Model.LiczbaAktywnychNaborow</p>
+                <p class="text-muted small mb-0">aktywnych naborów</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <p class="display-6 mb-0">@Model.LiczbaProblemow</p>
+                <p class="text-muted small mb-0">zgłoszonych problemów</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="my-4">
+    <h2>Jak to działa</h2>
+    <ol>
+        <li><strong>Autor</strong> opisuje pomysł w kreatorze. Asystent AI pomaga doprecyzować.</li>
+        <li>System porównuje pomysł z <strong>Biblioteką Innowacji Społecznych</strong> i podobnymi zgłoszeniami.</li>
+        <li>Fiszkę weryfikuje <strong>pracownik ROPS</strong>. Po akceptacji trafia na publiczną kartę.</li>
+        <li><strong>Mieszkańcy</strong> popierają, komentują, zgłaszają chęć testowania.</li>
+        <li>Autor składa <strong>wniosek</strong> w nabory ROPS i testuje rozwiązanie z zainteresowanymi.</li>
+        <li>Sprawdzona innowacja wraca do biblioteki jako gotowe rozwiązanie dla innych.</li>
+    </ol>
+</section>
+
+<section class="my-4">
+    <h2>Zacznij</h2>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h5">Mam pomysł</h3>
+                    <p>Opisz pomysł, dostań podpowiedzi AI, zobacz podobne rozwiązania.</p>
+                    <a class="btn btn-primary" asp-page="/Kreator/Rodzaj">Otwórz kreator</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h5">Chcę pomóc</h3>
+                    <p>Przeglądaj pomysły, popieraj je, zgłaszaj się do testów.</p>
+                    <a class="btn btn-outline-primary" asp-page="/Publiczne/DoTestowania">Zobacz innowacje</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h3 class="h5">Pracuję w ROPS</h3>
+                    <p>Zweryfikuj fiszki, utwórz nabór, oceniaj wnioski.</p>
+                    <a class="btn btn-outline-primary" asp-page="/Rops/Weryfikacja">Panel ROPS</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

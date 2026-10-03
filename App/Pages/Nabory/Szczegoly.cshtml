@@ -1,0 +1,54 @@
+@page
+@model App.Pages.Nabory.SzczegolyModel
+@{
+    ViewData["Title"] = Model.Nabor!.Nazwa;
+}
+
+<nav aria-label="okruszki" class="mb-2">
+    <a asp-page="/Nabory/Index" class="small">← Lista naborów</a>
+</nav>
+
+<h1>@Model.Nabor.Nazwa</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Termin</dt>
+    <dd class="col-sm-9">@Model.Nabor.DataOtwarcia.ToString("yyyy-MM-dd") – @Model.Nabor.DataZamkniecia.ToString("yyyy-MM-dd")</dd>
+    <dt class="col-sm-3">Budżet maksymalny</dt>
+    <dd class="col-sm-9">@Model.Nabor.BudzetMaks.ToString("C")</dd>
+    <dt class="col-sm-3">Wkład własny</dt>
+    <dd class="col-sm-9">min. @Model.Nabor.ProcentWkladuWlasnego%</dd>
+    <dt class="col-sm-3">Opis</dt>
+    <dd class="col-sm-9">@Model.Nabor.Opis</dd>
+    <dt class="col-sm-3">Kryteria oceny</dt>
+    <dd class="col-sm-9"><pre class="small bg-light p-2 border rounded">@Model.Nabor.KryteriaMd</pre></dd>
+</dl>
+
+<section class="my-4">
+    <h2>Twoje fiszki, z których możesz utworzyć wniosek</h2>
+    @if (Model.MojeFiszki.Count == 0)
+    {
+        <p class="text-muted">
+            Nie masz jeszcze fiszki, z której można utworzyć wniosek. Przygotuj fiszkę w
+            <a asp-page="/Kreator/Rodzaj">kreatorze pomysłów</a>.
+        </p>
+    }
+    else
+    {
+        <ul class="list-group">
+        @foreach (var i in Model.MojeFiszki)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>@i.Karta!.Tytul</strong>
+                    <span class="badge bg-light text-dark border ms-2">@i.Rodzaj</span>
+                    <span class="badge bg-info text-dark ms-1">@i.Karta.Status</span>
+                </div>
+                <form method="post" asp-page="/Wnioski/Generuj" asp-route-ideaId="@i.Id" asp-route-callId="@Model.Nabor.Id">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-sm btn-primary">Przygotuj wniosek z tego pomysłu</button>
+                </form>
+            </li>
+        }
+        </ul>
+    }
+</section>

@@ -1,0 +1,162 @@
+@page
+@model App.Pages.Wnioski.BudzetModel
+@{
+    ViewData["Title"] = "Budżet wniosku";
+    var limit = Model.Wniosek.Call.BudzetMaks;
+    var przekroczenie = Model.SumaBrutto > limit;
+    var wymaganyWklad = Model.Wniosek.Call.ProcentWkladuWlasnego;
+    var brakWkladu = Model.ProcentWkladu < wymaganyWklad;
+}
+
+<h1>Budżet wniosku</h1>
+<p class="text-muted small">Nabór: @Model.Wniosek.Call.Nazwa</p>
+
+@await Html.PartialAsync("_WniosekMenu", (Model.Id, "budzet"))
+
+<section class="my-3" aria-labelledby="podsumowanie">
+    <h2 id="podsumowanie" class="h6">Podsumowanie</h2>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <div class="card @(przekroczenie ? "border-danger" : "")">
+                <div class="card-body">
+                    <p class="small mb-1 text-muted">Suma budżetu</p>
+                    <p class="h4 mb-0">@Model.SumaBrutto.ToString("C")</p>
+                    <p class="small @(przekroczenie ? "text-danger" : "text-muted") mb-0" aria-live="polite">
+                        Limit naboru: @limit.ToString("C")
+                        @if (przekroczenie) { <span>— przekroczenie o @((Model.SumaBrutto - limit).ToString("C"))</span> }
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card @(brakWkladu ? "border-warning" : "")">
+                <div class="card-body">
+                    <p class="small mb-1 text-muted">Wkład własny</p>
+                    <p class="h4 mb-0">@Model.SumaWkladu.ToString("C") (@Model.ProcentWkladu.ToString("0.#")%)</p>
+                    <p class="small @(brakWkladu ? "text-warning" : "text-muted") mb-0" aria-live="polite">
+                        Wymagane: min. @wymaganyWklad%
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <p class="small mb-1 text-muted">Pozycji budżetowych</p>
+                    <p class="h4 mb-0">@Model.Wniosek.Budzet.Count</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="my-4">
+    <h2 class="h6">Pozycje budżetu</h2>
+    @if (Model.Wniosek.Budzet.Count == 0)
+    {
+        <p class="text-muted">Brak pozycji. Dodaj pierwszą poniżej.</p>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-sm align-middle">
+                <caption class="visually-hidden">Pozycje budżetowe wniosku</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Lp.</th>
+                        <th scope="col">Okres</th>
+                        <th scope="col">Kategoria</th>
+                        <th scope="col">Opis</th>
+                        <th scope="col" class="text-end">Jedn.</th>
+                        <th scope="col" class="text-end">Koszt jedn.</th>
+                        <th scope="col" class="text-end">Kwota</th>
+                        <th scope="col" class="text-end">Wkład własny</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var b in Model.Wniosek.Budzet)
+                {
+                    <tr>
+                        <td>@b.Lp</td>
+                        <td class="small">@b.Okres</td>
+                        <td>@b.Kategoria</td>
+                        <td class="small">@b.Opis<br /><em class="text-muted">@b.Uzasadnienie</em></td>
+                        <td class="text-end">@b.Jednostki</td>
+                        <td class="text-end">@b.KosztJednostkowy.ToString("C")</td>
+                        <td class="text-end">@b.KwotaBrutto.ToString("C")</td>
+                        <td class="text-end">@b.WkladWlasny.ToString("C")</td>
+                        <td class="text-end">
+                            <form method="post" asp-page-handler="Usun" asp-route-id="@Model.Id" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="pozycjaId" value="@b.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger" aria-label="Usuń pozycję @b.Opis">Usuń</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+                <tfoot>
+                    <tr class="fw-semibold">
+                        <td colspan="6" class="text-end">Razem:</td>
+                        <td class="text-end">@Model.SumaBrutto.ToString("C")</td>
+                        <td class="text-end">@Model.SumaWkladu.ToString("C")</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    }
+</section>
+
+<section class="my-4">
+    <h2 class="h6">Dodaj pozycję</h2>
+    <form method="post" asp-page-handler="Dodaj" asp-route-id="@Model.Id" class="row g-2">
+        @Html.AntiForgeryToken()
+        <div class="col-md-2">
+            <label for="okres" class="form-label">Okres</label>
+            <select id="okres" name="NowaPozycja.Okres" class="form-select" required>
+                <option value="Przygotowawczy">Przygotowawczy</option>
+                <option value="TestFaza1">Testowanie — Faza I</option>
+                <option value="TestFaza2">Testowanie — Faza II</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="kategoria" class="form-label">Kategoria</label>
+            <input id="kategoria" name="NowaPozycja.Kategoria" class="form-control" required list="kategorie" />
+            <datalist id="kategorie">
+                <option value="Osobowe"></option>
+                <option value="Materiały"></option>
+                <option value="Usługi obce"></option>
+                <option value="Podróże"></option>
+                <option value="Sprzęt"></option>
+                <option value="Promocja"></option>
+                <option value="Inne"></option>
+            </datalist>
+        </div>
+        <div class="col-md-4">
+            <label for="opis" class="form-label">Opis</label>
+            <input id="opis" name="NowaPozycja.Opis" class="form-control" required />
+        </div>
+        <div class="col-md-1">
+            <label for="jedn" class="form-label">Jedn.</label>
+            <input id="jedn" name="NowaPozycja.Jednostki" type="number" min="1" value="1" class="form-control" required />
+        </div>
+        <div class="col-md-2">
+            <label for="kj" class="form-label">Koszt jedn.</label>
+            <input id="kj" name="NowaPozycja.KosztJednostkowy" type="number" step="0.01" min="0" value="0" class="form-control" required />
+        </div>
+        <div class="col-md-2">
+            <label for="ww" class="form-label">Wkład własny</label>
+            <input id="ww" name="NowaPozycja.WkladWlasny" type="number" step="0.01" min="0" value="0" class="form-control" />
+        </div>
+        <div class="col-12">
+            <label for="uzas" class="form-label">Uzasadnienie</label>
+            <textarea id="uzas" name="NowaPozycja.Uzasadnienie" class="form-control" rows="2"></textarea>
+        </div>
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Dodaj pozycję</button>
+            <a class="btn btn-outline-secondary" asp-page="/Wnioski/Harmonogram" asp-route-id="@Model.Id">Przejdź do harmonogramu</a>
+        </div>
+    </form>
+</section>

@@ -1,0 +1,67 @@
+@page
+@model App.Pages.Rops.KreatorNaboruModel
+@{
+    ViewData["Title"] = "Nowy nabór";
+}
+
+<h1>Nowy nabór</h1>
+<p class="text-muted">Utwórz nabór — będzie od razu aktywny i widoczny dla autorów innowacji.</p>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert" aria-live="assertive">
+        @foreach (var kv in ViewData.ModelState)
+        {
+            foreach (var e in kv.Value!.Errors)
+            {
+                <p class="mb-0">@e.ErrorMessage</p>
+            }
+        }
+    </div>
+}
+
+<form method="post">
+    @Html.AntiForgeryToken()
+    <div class="row g-3">
+        <div class="col-md-8">
+            <label asp-for="Nabor.Nazwa" class="form-label">Nazwa naboru</label>
+            <input asp-for="Nabor.Nazwa" class="form-control" required maxlength="200" />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Nabor.BudzetMaks" class="form-label">Budżet maks. (PLN)</label>
+            <input asp-for="Nabor.BudzetMaks" type="number" step="100" min="0" class="form-control" required />
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Nabor.DataOtwarcia" class="form-label">Data otwarcia</label>
+            <input asp-for="Nabor.DataOtwarcia" type="date" class="form-control" required />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Nabor.DataZamkniecia" class="form-label">Data zamknięcia</label>
+            <input asp-for="Nabor.DataZamkniecia" type="date" class="form-control" required />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Nabor.ProcentWkladuWlasnego" class="form-label">Wkład własny (%)</label>
+            <input asp-for="Nabor.ProcentWkladuWlasnego" type="number" step="1" min="0" max="100" class="form-control" />
+        </div>
+        <div class="col-md-8">
+            <label asp-for="Nabor.DozwoloneRodzaje" class="form-label">Dozwolone rodzaje pomysłów</label>
+            <input asp-for="Nabor.DozwoloneRodzaje" class="form-control" placeholder="Innowacja,DobraPraktyka,Mikroskala" />
+        </div>
+
+        <div class="col-12">
+            <label asp-for="Nabor.Opis" class="form-label">Opis naboru</label>
+            <textarea asp-for="Nabor.Opis" class="form-control" rows="4" maxlength="4000" required></textarea>
+        </div>
+        <div class="col-12">
+            <label asp-for="Nabor.KryteriaMd" class="form-label">Kryteria oceny (Markdown)</label>
+            <textarea asp-for="Nabor.KryteriaMd" class="form-control" rows="6" placeholder="- Innowacyjność&#10;- Potencjał skalowania&#10;- Jakość diagnozy"></textarea>
+        </div>
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Utwórz nabór</button>
+            <a class="btn btn-outline-secondary" asp-page="/Rops/Weryfikacja">Anuluj</a>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,37 @@
+@page
+@model App.Pages.Nabory.IndexModel
+@{
+    ViewData["Title"] = "Aktywne nabory";
+}
+
+<h1>Aktywne nabory</h1>
+<p class="text-muted">Nabory, do których możesz zgłosić swoje pomysły.</p>
+
+@if (Model.Nabory.Count == 0)
+{
+    <div class="alert alert-info">Brak aktywnych naborów. Zajrzyj później.</div>
+}
+else
+{
+    <ul class="list-group my-3">
+    @foreach (var n in Model.Nabory)
+    {
+        var dni = (n.DataZamkniecia - DateTime.UtcNow).Days;
+        <li class="list-group-item">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                <div>
+                    <h2 class="h5 mb-1">@n.Nazwa</h2>
+                    <p class="small text-muted mb-2">
+                        Termin: @n.DataOtwarcia.ToString("yyyy-MM-dd") – @n.DataZamkniecia.ToString("yyyy-MM-dd")
+                        · Pozostało dni: @Math.Max(0, dni)
+                        · Budżet: do @n.BudzetMaks.ToString("C0")
+                        · Wkład własny: @n.ProcentWkladuWlasnego%
+                    </p>
+                    <p class="mb-0">@n.Opis</p>
+                </div>
+                <a class="btn btn-outline-primary btn-sm" asp-page="/Nabory/Szczegoly" asp-route-id="@n.Id">Szczegóły</a>
+            </div>
+        </li>
+    }
+    </ul>
+}

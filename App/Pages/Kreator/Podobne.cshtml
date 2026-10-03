@@ -1,0 +1,75 @@
+@page
+@model App.Pages.Kreator.PodobneModel
+@{
+    ViewData["Title"] = "Podobne rozwiązania";
+}
+
+<nav aria-label="okruszki" class="mb-2">
+    <a asp-page="/Kreator/Krok" asp-route-id="@Model.Id" asp-route-krok="3" class="small">← Wróć do kreatora</a>
+</nav>
+
+<h1>Podobne rozwiązania</h1>
+<p class="text-muted">
+    System porównał Twój pomysł <strong>„@Model.Idea!.Karta!.Tytul"</strong>
+    z biblioteką sprawdzonych innowacji, opublikowanymi fiszkami i problemami zgłoszonymi przez mieszkańców.
+</p>
+
+@if (Model.Wyniki.Count == 0)
+{
+    <div class="alert alert-info">
+        Nie znaleziono podobnych rozwiązań — Twój pomysł wygląda na unikalny. Możesz kontynuować pracę nad fiszką.
+    </div>
+}
+else
+{
+    <ul class="list-group my-3">
+    @foreach (var w in Model.Wyniki)
+    {
+        <li class="list-group-item">
+            <div class="d-flex justify-content-between align-items-start gap-2 flex-wrap">
+                <div class="flex-grow-1">
+                    <h2 class="h6 mb-1">
+                        <span class="badge @App.Pages.Kreator.PodobneModel.Klasa(w.Kategoria) me-2">@App.Pages.Kreator.PodobneModel.Etykieta(w.Kategoria)</span>
+                        @w.Tytul
+                    </h2>
+                    @if (!string.IsNullOrWhiteSpace(w.Streszczenie))
+                    {
+                        <p class="small text-muted mb-1">@w.Streszczenie</p>
+                    }
+                    @if (w.WspolneTagi.Count > 0)
+                    {
+                        <p class="small mb-0">
+                            Wspólne tagi:
+                            @foreach (var t in w.WspolneTagi)
+                            {
+                                <span class="badge bg-light text-dark border me-1">@t</span>
+                            }
+                        </p>
+                    }
+                </div>
+                <div class="text-end">
+                    <div class="small text-muted">Podobieństwo: @((int)(w.Wynik * 100))%</div>
+                    @if (w.Kategoria != KategoriaPodobienstwa.TenSamProblem)
+                    {
+                        <a class="btn btn-sm btn-outline-primary mt-1" asp-page="/Publiczne/Karta" asp-route-id="@w.IdeaId">Zobacz</a>
+                    }
+                </div>
+            </div>
+        </li>
+    }
+    </ul>
+
+    <div class="alert alert-light border">
+        <strong>Co możesz zrobić:</strong>
+        <ul class="mb-0">
+            <li>Zapoznać się z istniejącym rozwiązaniem i opisać, czym się różnisz.</li>
+            <li>Przeformułować pomysł jako adaptację sprawdzonej innowacji.</li>
+            <li>Kontynuować pracę nad swoim pomysłem — system zachowa link do podobnych rozwiązań.</li>
+        </ul>
+    </div>
+}
+
+<div class="d-flex gap-2">
+    <a class="btn btn-primary" asp-page="/Kreator/Krok" asp-route-id="@Model.Id" asp-route-krok="3">Kontynuuj kreator</a>
+    <a class="btn btn-outline-secondary" asp-page="/Moje/Index">Przerwij i wróć</a>
+</div>

@@ -1,0 +1,103 @@
+@page
+@model App.Pages.Autor.InnowacjaModel
+@{
+    ViewData["Title"] = Model.Idea.Karta?.Tytul ?? "Panel innowacji";
+    var k = Model.Idea.Karta;
+    var mozeRozpoczacTest = Model.AktywnaSesja is null
+        && (Model.Idea.EtapInnowacji == EtapInnowacji.FinansowaniePrzyznane
+            || Model.Idea.EtapInnowacji == EtapInnowacji.WPrzygotowaniu
+            || Model.Idea.EtapInnowacji == EtapInnowacji.WRealizacji
+            || Model.Idea.EtapInnowacji == EtapInnowacji.TestyZakonczone);
+}
+
+<nav aria-label="okruszki" class="mb-2">
+    <a asp-page="/Moje/Index" class="small">← Moje pomysły</a>
+</nav>
+
+<h1>@k?.Tytul</h1>
+<p>
+    <span class="badge bg-light text-dark border">@Model.Idea.Rodzaj</span>
+    <span class="badge bg-light text-dark border">@Model.Idea.EtapInnowacji</span>
+</p>
+
+<div class="row g-3 my-3">
+    <div class="col-md-4"><div class="card"><div class="card-body"><p class="h5 mb-0">@Model.LiczbaZgloszen</p><p class="small text-muted mb-0">zgłoszeń testerów</p></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><p class="h5 mb-0">@Model.LiczbaOpinii</p><p class="small text-muted mb-0">opinii testerów</p></div></div></div>
+    <div class="col-md-4"><div class="card"><div class="card-body"><p class="h5 mb-0">@(Model.AktywnaSesja?.Status.ToString() ?? "—")</p><p class="small text-muted mb-0">sesja testowa</p></div></div></div>
+</div>
+
+<div class="d-flex gap-2 flex-wrap">
+    <a class="btn btn-outline-secondary" asp-page="/Publiczne/Karta" asp-route-id="@Model.Idea.Id">Publiczna karta</a>
+    @if (Model.AktywnaSesja is not null)
+    {
+        <a class="btn btn-primary" asp-page="/Autor/Testerzy" asp-route-ideaId="@Model.Idea.Id">Zarządzaj testerami</a>
+    }
+    @if (mozeRozpoczacTest)
+    {
+        <button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#rozpocznijTest" aria-expanded="false" aria-controls="rozpocznijTest">
+            Rozpocznij testowanie
+        </button>
+    }
+</div>
+
+@if (mozeRozpoczacTest)
+{
+    <section class="collapse mt-4" id="rozpocznijTest">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="h5">Rozpocznij testowanie innowacji</h2>
+                <form method="post" asp-page-handler="Rozpocznij">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <div class="mb-3">
+                        <label asp-for="NowaSesja.CoBedzieTestowane" class="form-label">Co będzie testowane?</label>
+                        <textarea asp-for="NowaSesja.CoBedzieTestowane" class="form-control" rows="3" required maxlength="2000"></textarea>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label asp-for="NowaSesja.KogoSzukamy" class="form-label">Kogo szukamy</label>
+                            <textarea asp-for="NowaSesja.KogoSzukamy" class="form-control" rows="2" maxlength="1000"></textarea>
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="NowaSesja.LiczbaTesterow" class="form-label">Ilu testerów?</label>
+                            <input asp-for="NowaSesja.LiczbaTesterow" type="number" min="1" max="200" class="form-control" required />
+                        </div>
+                        <div class="col-md-3">
+                            <fieldset>
+                                <legend class="form-label">Tryb</legend>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" asp-for="NowaSesja.Zdalny" value="true" id="zdalnyTak" />
+                                    <label class="form-check-label" for="zdalnyTak">Zdalny</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" asp-for="NowaSesja.Zdalny" value="false" id="zdalnyNie" />
+                                    <label class="form-check-label" for="zdalnyNie">Stacjonarny</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="NowaSesja.Termin" class="form-label">Termin</label>
+                            <input asp-for="NowaSesja.Termin" type="date" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="NowaSesja.CzasTrwania" class="form-label">Ile czasu zajmuje?</label>
+                            <input asp-for="NowaSesja.CzasTrwania" class="form-control" placeholder="np. 1h, 2 spotkania" maxlength="200" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="NowaSesja.Wymagania" class="form-label">Wymagania</label>
+                            <input asp-for="NowaSesja.Wymagania" class="form-control" placeholder="opcjonalnie" maxlength="1000" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="NowaSesja.Instrukcja" class="form-label">Krótka instrukcja dla testerów</label>
+                            <textarea asp-for="NowaSesja.Instrukcja" class="form-control" rows="3" required maxlength="2000"></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-success">Opublikuj zapotrzebowanie na testerów</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#rozpocznijTest">Anuluj</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+}

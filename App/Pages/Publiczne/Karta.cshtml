@@ -1,0 +1,185 @@
+@page
+@model App.Pages.Publiczne.KartaModel
+@{
+    ViewData["Title"] = Model.Karta?.Tytul ?? "Pomysł";
+    var k = Model.Karta!;
+    var i = Model.Idea!;
+}
+
+<article>
+    <header class="mb-3">
+        <h1>@k.Tytul</h1>
+        <p class="mb-1">
+            <span class="badge bg-light text-dark border">@i.Rodzaj</span>
+            <span class="badge bg-light text-dark border">@i.EtapInnowacji</span>
+            @if (Model.AktywnaSesjaTestowa is not null)
+            {
+                <span class="badge bg-warning text-dark">Ta innowacja szuka testerów</span>
+            }
+        </p>
+        <p class="text-muted small">Autor: @i.Autor.Imie @i.Autor.Nazwisko @(i.Autor.Organizacja is null ? "" : "— " + i.Autor.Organizacja)</p>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(k.Streszczenie) || !string.IsNullOrWhiteSpace(k.PodsumowanieAI))
+    {
+        <p class="lead">@(k.PodsumowanieAI ?? k.Streszczenie)</p>
+    }
+
+    <dl>
+        @if (!string.IsNullOrWhiteSpace(k.Problem)) { <dt>Problem</dt><dd>@k.Problem</dd> }
+        @if (!string.IsNullOrWhiteSpace(k.GrupaDocelowa)) { <dt>Grupa docelowa</dt><dd>@k.GrupaDocelowa</dd> }
+        @if (!string.IsNullOrWhiteSpace(k.Rozwiazanie)) { <dt>Rozwiązanie</dt><dd>@k.Rozwiazanie</dd> }
+        @if (!string.IsNullOrWhiteSpace(k.Rezultaty)) { <dt>Rezultaty</dt><dd>@k.Rezultaty</dd> }
+        @if (!string.IsNullOrWhiteSpace(k.Obszar)) { <dt>Obszar</dt><dd>@k.Obszar</dd> }
+        @if (!string.IsNullOrWhiteSpace(k.Zasoby)) { <dt>Potrzebne zasoby</dt><dd>@k.Zasoby</dd> }
+        @if (!string.IsNullOrWhiteSpace(k.Tagi)) {
+            <dt>Tagi</dt>
+            <dd>
+                @foreach (var t in k.Tagi.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                {
+                    <span class="badge bg-light text-dark border me-1">@t</span>
+                }
+            </dd>
+        }
+    </dl>
+</article>
+
+<section class="my-4" aria-labelledby="akcje">
+    <h2 id="akcje" class="h5">Twój głos</h2>
+
+    <div class="d-flex gap-2 flex-wrap align-items-center">
+        <form method="post" asp-page-handler="Poparcie">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn @(Model.JuzPoparl ? "btn-success" : "btn-outline-success")">
+                @(Model.JuzPoparl ? "✓ Popierasz ten pomysł" : "Popieram ten pomysł")
+            </button>
+        </form>
+        <span class="text-muted small" aria-live="polite">
+            Ten pomysł popiera <strong>@Model.LiczbaPoparcia</strong> @((Model.LiczbaPoparcia == 1) ? "osoba" : "osób").
+        </span>
+    </div>
+
+    @if (Model.AktywnaSesjaTestowa is not null)
+    {
+        <div class="alert alert-warning mt-3" aria-labelledby="szukaTest">
+            <strong id="szukaTest">Autor szuka testerów.</strong>
+            @if (!string.IsNullOrWhiteSpace(Model.AktywnaSesjaTestowa.CoBedzieTestowane))
+            {
+                <p class="small mb-2 mt-1">@Model.AktywnaSesjaTestowa.CoBedzieTestowane</p>
+            }
+            @if (Model.Zgloszono)
+            {
+                <p class="mb-0" role="status" aria-live="polite">Twoje zgłoszenie zostało przekazane autorowi innowacji.</p>
+            }
+            else
+            {
+                <details>
+                    <summary class="btn btn-sm btn-warning">Chcę przetestować</summary>
+                    <form method="post" asp-page-handler="ZglosDoTestow" class="mt-3">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+
+                        <div class="mb-2">
+                            <label for="imiePr" class="form-label">Imię lub profil</label>
+                            <input id="imiePr" name="ImieLubProfil" class="form-control" required maxlength="120" />
+                        </div>
+                        <div class="mb-2">
+                            <label for="pow" class="form-label">Dlaczego chcesz uczestniczyć? (opcjonalnie)</label>
+                            <textarea id="pow" name="PowodZgloszenia" class="form-control" rows="2" maxlength="1000"></textarea>
+                        </div>
+                        <div class="mb-2">
+                            <label for="kont" class="form-label">Preferowany sposób kontaktu</label>
+                            <input id="kont" name="PreferowanyKontakt" class="form-control" placeholder="np. email, telefon, komunikator" maxlength="200" />
+                        </div>
+                        <div class="mb-2">
+                            <label for="udog" class="form-label">Potrzebne udogodnienia (opcjonalnie)</label>
+                            <input id="udog" name="PotrzebneUdogodnienia" class="form-control" placeholder="np. większy tekst, zdalny tryb, tłumacz PJM" maxlength="500" />
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="zg" name="ZgodaNaPrzekazanieDanych" value="true" />
+                            <label class="form-check-label" for="zg">
+                                Wyrażam zgodę na przekazanie moich danych kontaktowych autorowi innowacji.
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-warning btn-sm">Wyślij zgłoszenie</button>
+                    </form>
+                </details>
+            }
+        </div>
+    }
+</section>
+
+<section class="my-4" aria-labelledby="komentarze">
+    <h2 id="komentarze" class="h5">Komentarze (@Model.Komentarze.Count)</h2>
+
+    <form method="post" asp-page-handler="Komentarz" class="mb-3">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        <label for="komentarz" class="form-label visually-hidden">Twój komentarz</label>
+        <textarea id="komentarz" name="NowyKomentarz" class="form-control" rows="2" required maxlength="2000" placeholder="Dodaj komentarz, zasugeruj poprawkę, zaproponuj kierunek…"></textarea>
+        <button type="submit" class="btn btn-outline-primary btn-sm mt-2">Dodaj komentarz</button>
+    </form>
+
+    @if (Model.Komentarze.Count == 0)
+    {
+        <p class="text-muted">Jeszcze nikt nie skomentował.</p>
+    }
+    else
+    {
+        <ul class="list-unstyled">
+        @foreach (var c in Model.Komentarze)
+        {
+            <li class="border-start border-3 ps-3 mb-3">
+                <p class="mb-1">@c.Tresc</p>
+                <p class="small text-muted mb-0">@c.Autor.Imie @c.Autor.Nazwisko · @c.UtworzonoUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</p>
+            </li>
+        }
+        </ul>
+    }
+</section>
+
+<section class="my-4" aria-labelledby="oferty">
+    <h2 id="oferty" class="h5">Oferty organizacji (@Model.Oferty.Count)</h2>
+
+    <details class="mb-3">
+        <summary>Moja organizacja może pomóc</summary>
+        <form method="post" asp-page-handler="Oferta" class="mt-2">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <div class="mb-2">
+                <label for="typOferty" class="form-label">Typ oferty</label>
+                <select id="typOferty" name="TypOferty" class="form-select" required>
+                    <option value="">— wybierz —</option>
+                    <option value="Lokal">Lokal / przestrzeń</option>
+                    <option value="Zasoby">Zasoby rzeczowe</option>
+                    <option value="Wolontariusze">Wolontariusze</option>
+                    <option value="Partnerstwo">Partnerstwo formalne</option>
+                    <option value="Finansowanie">Współfinansowanie</option>
+                </select>
+            </div>
+            <div class="mb-2">
+                <label for="opisOferty" class="form-label">Opis</label>
+                <textarea id="opisOferty" name="OpisOferty" class="form-control" rows="2" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-outline-primary btn-sm">Zgłoś ofertę</button>
+        </form>
+    </details>
+
+    @if (Model.Oferty.Count == 0)
+    {
+        <p class="text-muted">Brak zgłoszonych ofert.</p>
+    }
+    else
+    {
+        <ul class="list-group">
+        @foreach (var o in Model.Oferty)
+        {
+            <li class="list-group-item">
+                <strong>@o.TypOferty</strong> — @(o.OrganizacjaUser.Organizacja ?? (o.OrganizacjaUser.Imie + " " + o.OrganizacjaUser.Nazwisko))
+                <p class="small mb-0">@o.Opis</p>
+            </li>
+        }
+        </ul>
+    }
+</section>

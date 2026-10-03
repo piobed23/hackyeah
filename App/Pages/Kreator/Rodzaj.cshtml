@@ -1,0 +1,44 @@
+@page
+@model App.Pages.Kreator.RodzajModel
+@{
+    ViewData["Title"] = "Nowy pomysł — wybierz rodzaj";
+}
+
+<h1 id="krok-heading" tabindex="-1">Nowy pomysł — wybierz rodzaj</h1>
+<p class="text-muted">Zdecyduj, w jakim trybie zgłaszasz pomysł. Od wyboru zależą pytania w kolejnych krokach.</p>
+
+<form method="post">
+    @Html.AntiForgeryToken()
+    <fieldset class="row g-3 my-3">
+        <legend class="visually-hidden">Rodzaj zgłaszanego pomysłu</legend>
+
+        <div class="col-md-4">
+            <input type="radio" class="btn-check" name="rodzaj" id="r-inn" value="Innowacja" checked />
+            <label class="btn btn-outline-primary w-100 h-100 text-start p-3" for="r-inn">
+                <strong>Nowa innowacja</strong>
+                <div class="small text-muted mt-1">Pomysł, który dopiero chcesz sprawdzić w praktyce. Zaczynasz od zera.</div>
+            </label>
+        </div>
+
+        <div class="col-md-4">
+            <input type="radio" class="btn-check" name="rodzaj" id="r-dp" value="DobraPraktyka" />
+            <label class="btn btn-outline-primary w-100 h-100 text-start p-3" for="r-dp">
+                <strong>Dobra praktyka</strong>
+                <div class="small text-muted mt-1">Masz działające rozwiązanie z wynikami. Chcesz się nim podzielić.</div>
+            </label>
+        </div>
+
+        <div class="col-md-4">
+            <input type="radio" class="btn-check" name="rodzaj" id="r-mi" value="Mikroskala" />
+            <label class="btn btn-outline-primary w-100 h-100 text-start p-3" for="r-mi">
+                <strong>Rozwiązanie w mikroskali</strong>
+                <div class="small text-muted mt-1">Chcesz przetestować pomysł na małej grupie (do ~20 osób) i zdecydować, czy skalować.</div>
+            </label>
+        </div>
+    </fieldset>
+
+    <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" asp-page="/Moje/Index">Anuluj</a>
+        <button type="submit" class="btn btn-primary">Rozpocznij kreator</button>
+    </div>
+</form>

@@ -1,45 +1,95 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+@using App.Infrastructure.Enums
+@using App.Services.Context
+@inject IAuthContext Auth
+@{
+    var user = Auth.GetUser();
+    var rola = Auth.GetRola();
+}
+<!DOCTYPE html>
+<html lang="pl">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - App</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] — ROPS Innowacje</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/App.styles.css" asp-append-version="true" />
 </head>
 <body>
+    <a class="visually-hidden-focusable p-2 bg-primary text-white position-absolute top-0 start-0" href="#tresc">Przejdź do treści</a>
+
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom shadow-sm mb-3" aria-label="Główna nawigacja">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">App</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand fw-semibold" asp-page="/Index">ROPS Innowacje</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navMain" aria-controls="navMain"
+                        aria-expanded="false" aria-label="Rozwiń nawigację">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                        </li>
+                <div class="collapse navbar-collapse" id="navMain">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item"><a class="nav-link" asp-page="/Index">Start</a></li>
+                        @if (rola == RolaUzytkownika.Autor || rola == RolaUzytkownika.Admin)
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-page="/Moje/Index">Moje pomysły</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-page="/Kreator/Rodzaj">Dodaj pomysł</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-page="/Nabory/Index">Nabory</a></li>
+                        }
+                        <li class="nav-item"><a class="nav-link" asp-page="/Publiczne/DoTestowania">Innowacje do testowania</a></li>
+                        @if (rola == RolaUzytkownika.PracownikROPS || rola == RolaUzytkownika.Admin)
+                        {
+                            <li class="nav-item"><a class="nav-link" asp-page="/Rops/Weryfikacja">Weryfikacja fiszek</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-page="/Rops/KreatorNaboru">Nowy nabór</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-page="/Rops/PodgladTesterow">Testerzy</a></li>
+                        }
                     </ul>
+
+                    <form method="post" asp-page="/Index" asp-page-handler="ZmienRole" class="d-flex align-items-center gap-2">
+                        @Html.AntiForgeryToken()
+                        <label for="rolaDemo" class="form-label mb-0 small text-muted">Rola demonstracyjna:</label>
+                        <select id="rolaDemo" name="rola" class="form-select form-select-sm" aria-label="Rola demonstracyjna" style="width: auto;">
+                            @foreach (var r in Enum.GetValues<RolaUzytkownika>())
+                            {
+                                <option value="@r" selected="@(r == rola)">@r</option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Zmień</button>
+                        @if (user is not null)
+                        {
+                            <span class="small text-muted ms-2" aria-live="polite">@user.Imie @user.Nazwisko</span>
+                        }
+                    </form>
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
-        <main role="main" class="pb-3">
+        <main id="tresc" role="main" class="pb-3" tabindex="-1">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - App - <a asp-area="" asp-page="/Privacy">Privacy</a>
+    <footer class="border-top footer text-muted mt-5">
+        <div class="container py-3 small">
+            <div class="d-flex flex-wrap gap-3 justify-content-between align-items-start">
+                <div>
+                    &copy; 2026 ROPS Małopolska — Platforma Innowacji Społecznych.
+                    <a asp-page="/Privacy">Polityka prywatności</a>.
+                </div>
+                <div>
+                    <details>
+                        <summary>Skróty klawiszowe i dostępność</summary>
+                        <ul class="small mt-2 mb-0">
+                            <li><kbd>Tab</kbd> / <kbd>Shift+Tab</kbd> — nawigacja między elementami</li>
+                            <li><kbd>Alt</kbd> + <kbd>→</kbd> / <kbd>←</kbd> — kolejny / poprzedni krok w kreatorze pomysłu</li>
+                            <li><kbd>Esc</kbd> — zamknięcie okna modalnego</li>
+                            <li>Pierwszym elementem po załadowaniu jest link „Przejdź do treści"</li>
+                            <li>Serwis zaprojektowany zgodnie z <abbr title="Web Content Accessibility Guidelines 2.1 poziom AA">WCAG 2.1 AA</abbr>.</li>
+                        </ul>
+                    </details>
+                </div>
+            </div>
         </div>
     </footer>
 

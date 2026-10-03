@@ -1,0 +1,26 @@
+@using App.Models
+@model AiSuggestion?
+<aside class="card bg-light border-0 shadow-sm" aria-labelledby="aiTitle" aria-live="polite">
+    <div class="card-body">
+        <h2 id="aiTitle" class="h6 text-primary">
+            <span aria-hidden="true">🤖</span> Asystent AI
+        </h2>
+        @if (Model is null || Model.Punkty.Count == 0)
+        {
+            <p class="text-muted small mb-0">Uzupełnij pole, a asystent zaproponuje doprecyzowanie.</p>
+        }
+        else
+        {
+            <p class="small text-muted mb-2">@Model.Preambula</p>
+            <ul class="small ps-3">
+                @foreach (var p in Model.Punkty)
+                {
+                    <li class="mb-1">@p</li>
+                }
+            </ul>
+            <p class="small text-muted mb-0">
+                Każdą propozycję zatwierdzasz Ty — nic nie jest wklejane automatycznie.
+            </p>
+        }
+    </div>
+</aside>

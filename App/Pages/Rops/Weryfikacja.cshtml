@@ -1,0 +1,92 @@
+@page
+@model App.Pages.Rops.WeryfikacjaModel
+@{
+    ViewData["Title"] = "Weryfikacja fiszek";
+}
+
+<h1>Weryfikacja fiszek</h1>
+<p class="text-muted">Fiszki przekazane do ROPS wymagają decyzji: akceptuj (publikacja), poproś o uzupełnienie, skieruj do eksperta, zaproponuj połączenie z istniejącym pomysłem, odrzuć.</p>
+
+<section class="my-4" aria-labelledby="kolejka">
+    <h2 id="kolejka" class="h5">Kolejka weryfikacji (@Model.DoWeryfikacji.Count)</h2>
+
+    @if (Model.DoWeryfikacji.Count == 0)
+    {
+        <div class="alert alert-info">Brak fiszek czekających na decyzję.</div>
+    }
+    else
+    {
+        @foreach (var i in Model.DoWeryfikacji)
+        {
+            var k = i.Karta!;
+            <article class="card my-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between flex-wrap">
+                        <div>
+                            <h3 class="h6 mb-1">
+                                @k.Tytul
+                                <span class="badge bg-info text-dark ms-2">@k.Status</span>
+                            </h3>
+                            <p class="small text-muted mb-2">
+                                Autor: @i.Autor.Imie @i.Autor.Nazwisko · @i.Rodzaj · aktualizowano @k.AktualizowanoUtc.ToLocalTime():yyyy-MM-dd HH:mm
+                            </p>
+                        </div>
+                        <a class="btn btn-sm btn-outline-secondary" asp-page="/Kreator/Podglad" asp-route-id="@i.Id">Zobacz pełną fiszkę</a>
+                    </div>
+
+                    <dl class="row small mb-2">
+                        @if (!string.IsNullOrWhiteSpace(k.Problem)) { <dt class="col-sm-2">Problem</dt><dd class="col-sm-10">@k.Problem</dd> }
+                        @if (!string.IsNullOrWhiteSpace(k.Rozwiazanie)) { <dt class="col-sm-2">Rozwiązanie</dt><dd class="col-sm-10">@k.Rozwiazanie</dd> }
+                        @if (!string.IsNullOrWhiteSpace(k.Tagi)) { <dt class="col-sm-2">Tagi</dt><dd class="col-sm-10">@k.Tagi</dd> }
+                    </dl>
+
+                    <form method="post" asp-page-handler="Decyzja" class="row g-2">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="ideaId" value="@i.Id" />
+                        <div class="col-md-3">
+                            <label for="typ-@i.Id" class="form-label">Decyzja</label>
+                            <select id="typ-@i.Id" name="typ" class="form-select" required>
+                                <option value="Akceptuj">Akceptuj — opublikuj</option>
+                                <option value="DoPoprawy">Poproś o poprawę</option>
+                                <option value="DoEksperta">Skieruj do eksperta</option>
+                                <option value="Polacz">Zaproponuj połączenie</option>
+                                <option value="Odrzuc">Odrzuć (podaj powód)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-7">
+                            <label for="kom-@i.Id" class="form-label">Uzasadnienie (dla autora)</label>
+                            <textarea id="kom-@i.Id" name="komentarz" class="form-control" rows="2" maxlength="2000"></textarea>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">Zapisz decyzję</button>
+                        </div>
+                    </form>
+                </div>
+            </article>
+        }
+    }
+</section>
+
+<section class="my-5" aria-labelledby="rozpatrzone">
+    <h2 id="rozpatrzone" class="h5">Ostatnio rozpatrzone (@Model.Rozpatrzone.Count)</h2>
+    @if (Model.Rozpatrzone.Count == 0)
+    {
+        <p class="text-muted">Brak zapisów.</p>
+    }
+    else
+    {
+        <ul class="list-group">
+        @foreach (var i in Model.Rozpatrzone)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>@i.Karta!.Tytul</strong>
+                    <span class="badge bg-light text-dark border ms-2">@i.Karta.Status</span>
+                    <span class="small text-muted ms-2">— @i.Autor.Imie @i.Autor.Nazwisko</span>
+                </div>
+                <span class="small text-muted">@i.Karta.AktualizowanoUtc.ToLocalTime():yyyy-MM-dd HH:mm</span>
+            </li>
+        }
+        </ul>
+    }
+</section>

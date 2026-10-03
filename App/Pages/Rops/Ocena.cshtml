@@ -1,0 +1,84 @@
+@page
+@model App.Pages.Rops.OcenaModel
+@{
+    ViewData["Title"] = "Ocena wniosków";
+}
+
+<h1>Ocena wniosków</h1>
+<p class="text-muted">Wnioski złożone przez autorów. Przeprowadź kontrolę formalną, ocenę merytoryczną i decyzję końcową.</p>
+
+<section class="my-4" aria-labelledby="kolejka">
+    <h2 id="kolejka" class="h5">Kolejka (@Model.DoOceny.Count)</h2>
+    @if (Model.DoOceny.Count == 0)
+    {
+        <div class="alert alert-info">Brak wniosków do oceny.</div>
+    }
+    else
+    {
+        @foreach (var w in Model.DoOceny)
+        {
+            <article class="card my-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <div>
+                            <h3 class="h6 mb-1">
+                                @w.TytulProjektu
+                                <span class="badge bg-info text-dark ms-2">@w.Status</span>
+                            </h3>
+                            <p class="small text-muted mb-1">
+                                Autor: @w.Autor.Imie @w.Autor.Nazwisko · Nabór: @w.Call.Nazwa · złożono @w.ZlozonoUtc?.ToLocalTime():yyyy-MM-dd HH:mm
+                            </p>
+                            <p class="small mb-1"><strong>Wnioskowana kwota:</strong> @w.WnioskowanaKwotaGrantu.ToString("C") z @w.Call.BudzetMaks.ToString("C")</p>
+                        </div>
+                        <a class="btn btn-sm btn-outline-secondary" asp-page="/Wnioski/Podglad" asp-route-id="@w.Id">Zobacz wniosek</a>
+                    </div>
+
+                    <form method="post" asp-page-handler="Zmien" class="row g-2 mt-2">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@w.Id" />
+                        <div class="col-md-3">
+                            <label for="st-@w.Id" class="form-label">Nowy status</label>
+                            <select id="st-@w.Id" name="nowyStatus" class="form-select" required>
+                                <option value="KontrolaFormalna">Kontrola formalna</option>
+                                <option value="OcenaMerytoryczna">Ocena merytoryczna</option>
+                                <option value="Wybrany">Wybrany do finansowania</option>
+                                <option value="Niewybrany">Niewybrany</option>
+                            </select>
+                        </div>
+                        <div class="col-md-7">
+                            <label for="k-@w.Id" class="form-label">Komentarz / wynik oceny</label>
+                            <textarea id="k-@w.Id" name="komentarz" class="form-control" rows="2" maxlength="4000"></textarea>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">Zapisz</button>
+                        </div>
+                    </form>
+                </div>
+            </article>
+        }
+    }
+</section>
+
+<section class="my-5" aria-labelledby="rozstrzygniete">
+    <h2 id="rozstrzygniete" class="h5">Ostatnio rozstrzygnięte (@Model.Rozpatrzone.Count)</h2>
+    @if (Model.Rozpatrzone.Count == 0)
+    {
+        <p class="text-muted">Brak.</p>
+    }
+    else
+    {
+        <ul class="list-group">
+        @foreach (var w in Model.Rozpatrzone)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>@w.TytulProjektu</strong>
+                    <span class="badge @(w.Status == App.Infrastructure.Enums.StatusWniosku.Wybrany ? "bg-success" : "bg-danger") ms-2">@w.Status</span>
+                    <span class="small text-muted ms-2">— @w.Autor.Imie @w.Autor.Nazwisko · @w.Call.Nazwa</span>
+                </div>
+                <a class="btn btn-sm btn-outline-primary" asp-page="/Wnioski/Podglad" asp-route-id="@w.Id">Podgląd</a>
+            </li>
+        }
+        </ul>
+    }
+</section>

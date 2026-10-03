@@ -1,0 +1,99 @@
+@page
+@model App.Pages.Moje.IndexModel
+@{
+    ViewData["Title"] = "Moje pomysły i wnioski";
+}
+
+<h1>Moje pomysły i wnioski</h1>
+<p class="text-muted">Twoje szkice, fiszki, publiczne pomysły i złożone wnioski.</p>
+
+<section class="my-4">
+    <div class="d-flex align-items-center justify-content-between">
+        <h2>Pomysły (@Model.MojePomysly.Count)</h2>
+        <a class="btn btn-primary" asp-page="/Kreator/Rodzaj">Dodaj pomysł</a>
+    </div>
+
+    @if (Model.MojePomysly.Count == 0)
+    {
+        <div class="alert alert-info mt-3">
+            Nie masz jeszcze pomysłów. Kliknij <strong>Dodaj pomysł</strong>, żeby rozpocząć.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive mt-3">
+            <table class="table table-hover align-middle">
+                <caption class="visually-hidden">Lista Twoich pomysłów</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Tytuł</th>
+                        <th scope="col">Rodzaj</th>
+                        <th scope="col">Status fiszki</th>
+                        <th scope="col">Etap innowacji</th>
+                        <th scope="col">Utworzono</th>
+                        <th scope="col" class="text-end">Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var i in Model.MojePomysly)
+                {
+                    <tr>
+                        <td>
+                            <strong>@(i.Karta?.Tytul ?? "(bez tytułu)")</strong>
+                        </td>
+                        <td>@i.Rodzaj</td>
+                        <td>
+                            @if (i.Karta is not null)
+                            {
+                                <span class="badge @App.Pages.Moje.IndexModel.KlasaStatusu(i.Karta.Status)">
+                                    @App.Pages.Moje.IndexModel.NazwaStatusu(i.Karta.Status)
+                                </span>
+                            }
+                        </td>
+                        <td>@i.EtapInnowacji</td>
+                        <td>@i.UtworzonoUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="text-end">
+                            @if (i.Karta?.Status is StatusFiszki.Szkic or StatusFiszki.WymagaUzupelnienia)
+                            {
+                                <a class="btn btn-sm btn-outline-primary" asp-page="/Kreator/Krok" asp-route-id="@i.Id" asp-route-krok="1">Edytuj</a>
+                            }
+                            else
+                            {
+                                <a class="btn btn-sm btn-outline-secondary" asp-page="/Kreator/Podglad" asp-route-id="@i.Id">Podgląd</a>
+                            }
+                            @if (i.Karta?.Status == StatusFiszki.Opublikowany)
+                            {
+                                <a class="btn btn-sm btn-outline-primary" asp-page="/Autor/Innowacja" asp-route-id="@i.Id">Panel</a>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>
+
+<section class="my-5">
+    <h2>Wnioski (@Model.MojeWnioski.Count)</h2>
+    @if (Model.MojeWnioski.Count == 0)
+    {
+        <p class="text-muted">Nie masz jeszcze przygotowanych wniosków. Przejdź do <a asp-page="/Nabory/Index">naborów</a>, aby wygenerować wniosek z fiszki.</p>
+    }
+    else
+    {
+        <ul class="list-group">
+        @foreach (var w in Model.MojeWnioski)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>@w.TytulProjektu</strong>
+                    <br />
+                    <span class="small text-muted">Nabór: @w.Call.Nazwa · Status: @w.Status</span>
+                </div>
+                <a class="btn btn-sm btn-outline-primary" asp-page="/Wnioski/Status" asp-route-id="@w.Id">Zobacz</a>
+            </li>
+        }
+        </ul>
+    }
+</section>

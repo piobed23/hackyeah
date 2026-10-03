@@ -1,0 +1,58 @@
+@page
+@model App.Pages.Wnioski.KompletnoscModel
+@{
+    ViewData["Title"] = "Kompletność wniosku";
+}
+
+<h1>Kompletność wniosku</h1>
+<p class="text-muted small">Nabór: @Model.Wniosek.Call.Nazwa</p>
+
+@await Html.PartialAsync("_WniosekMenu", (Model.Id, "kompletnosc"))
+
+<section class="my-4">
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+        <div class="flex-grow-1" style="min-width: 240px;">
+            <label class="form-label">Kompletność: @Model.Wynik.Procent%</label>
+            <div class="progress" role="progressbar" aria-valuenow="@Model.Wynik.Procent" aria-valuemin="0" aria-valuemax="100" style="height: 1.5rem;">
+                <div class="progress-bar @(Model.Wynik.CanSubmit ? "bg-success" : (Model.Wynik.Procent >= 70 ? "bg-warning" : "bg-danger"))" style="width: @Model.Wynik.Procent%;">
+                    @Model.Wynik.Procent%
+                </div>
+            </div>
+        </div>
+        @if (Model.Wynik.CanSubmit)
+        {
+            <a class="btn btn-success" asp-page="/Wnioski/Podglad" asp-route-id="@Model.Id">Przejdź do podglądu i złożenia</a>
+        }
+    </div>
+</section>
+
+@if (Model.Wynik.Braki.Count == 0)
+{
+    <div class="alert alert-success" role="status" aria-live="polite">
+        Wniosek jest kompletny. Możesz przejść do podglądu i złożenia.
+    </div>
+}
+else
+{
+    <section class="my-4" aria-labelledby="braki">
+        <h2 id="braki" class="h6">Do uzupełnienia (@Model.Wynik.Braki.Count)</h2>
+        <ul class="list-group">
+        @foreach (var b in Model.Wynik.Braki)
+        {
+            var strona = b.Pole switch
+            {
+                "budzet" => "/Wnioski/Budzet",
+                "harmonogram" => "/Wnioski/Harmonogram",
+                _ => "/Wnioski/Edycja"
+            };
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div>
+                    <strong>@b.Etykieta</strong>
+                    <p class="small text-muted mb-0">@b.Opis</p>
+                </div>
+                <a class="btn btn-sm btn-outline-primary" asp-page="@strona" asp-route-id="@Model.Id">Przejdź</a>
+            </li>
+        }
+        </ul>
+    </section>
+}

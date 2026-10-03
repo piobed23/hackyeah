@@ -1,0 +1,182 @@
+@page
+@using App.Infrastructure.Enums
+@using App.Models
+@model App.Pages.Wnioski.PodgladModel
+@{
+    ViewData["Title"] = "Podgląd wniosku";
+    var w = Model.Wniosek;
+    var oswiadczeniaDoAkceptacji = Oswiadczenia.DlaTypu(w.TypWnioskodawcy);
+}
+
+<h1>Podgląd formularza aplikacyjnego (zał. 3)</h1>
+<p class="text-muted small">Status: @w.Status · Nabór: @w.Call.Nazwa</p>
+
+@await Html.PartialAsync("_WniosekMenu", (Model.Id, "podglad"))
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert" aria-live="assertive">
+        @foreach (var k in ViewData.ModelState)
+        {
+            foreach (var e in k.Value!.Errors) { <p class="mb-0">@e.ErrorMessage</p> }
+        }
+    </div>
+}
+
+<article class="my-3 wniosek-print">
+    <section><h2 class="h5">1. Tytuł innowacji</h2><p>@w.TytulProjektu</p></section>
+
+    <section>
+        <h2 class="h5">2. Dane pomysłodawcy</h2>
+        <p><strong>Typ:</strong> @(w.TypWnioskodawcy switch {
+            TypWnioskodawcy.OsobaFizyczna => "Osoba fizyczna",
+            TypWnioskodawcy.Podmiot => "Podmiot",
+            TypWnioskodawcy.GrupaNieformalna => "Grupa nieformalna",
+            _ => w.TypWnioskodawcy.ToString()
+        })</p>
+        <dl class="row small">
+            @if (!string.IsNullOrWhiteSpace(w.NazwaPodmiotu)) {
+                <dt class="col-sm-3">Nazwa podmiotu</dt><dd class="col-sm-9">@w.NazwaPodmiotu</dd>
+                <dt class="col-sm-3">KRS / REGON / NIP</dt><dd class="col-sm-9">@w.KRS / @w.REGON / @w.NIP</dd>
+                <dt class="col-sm-3">Osoba upoważniona</dt><dd class="col-sm-9">@w.OsobaReprezentujaca (@w.FunkcjaReprezentujacego)</dd>
+                <dt class="col-sm-3">Osoba kontaktowa</dt><dd class="col-sm-9">@w.OsobaKontaktowa, tel. @w.TelefonKontaktowy, @w.EmailKontaktowy</dd>
+            }
+            @if (!string.IsNullOrWhiteSpace(w.Imie)) {
+                <dt class="col-sm-3">Imię i nazwisko</dt><dd class="col-sm-9">@w.Imie @w.Nazwisko</dd>
+            }
+            @if (!string.IsNullOrWhiteSpace(w.AdresKorespondencyjny)) {
+                <dt class="col-sm-3">Adres</dt><dd class="col-sm-9">@w.AdresKorespondencyjny, @w.KodPocztowy @w.Miejscowosc</dd>
+            }
+            @if (!string.IsNullOrWhiteSpace(w.Email)) {
+                <dt class="col-sm-3">Kontakt</dt><dd class="col-sm-9">tel. @w.Telefon · @w.Email</dd>
+            }
+            @if (!string.IsNullOrWhiteSpace(w.PartnerzyJson)) {
+                <dt class="col-sm-3">Partnerzy</dt><dd class="col-sm-9"><pre class="small mb-0">@w.PartnerzyJson</pre></dd>
+            }
+        </dl>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(w.OpisInnowacji)) { <section><h2 class="h5">3. Opis innowacji</h2><p style="white-space:pre-line">@w.OpisInnowacji</p></section> }
+    @if (!string.IsNullOrWhiteSpace(w.Innowacyjnosc)) { <section><h2 class="h5">4. Innowacyjność rozwiązania</h2><p style="white-space:pre-line">@w.Innowacyjnosc</p></section> }
+    @if (!string.IsNullOrWhiteSpace(w.DiagnozaProblemu))
+    {
+        <section>
+            <h2 class="h5">5. Diagnoza problemu</h2>
+            <p style="white-space:pre-line">@w.DiagnozaProblemu</p>
+            @if (!string.IsNullOrWhiteSpace(w.MapaWyzwanTemat)) { <p class="small text-muted">Mapa Wyzwań Społecznych: <strong>@w.MapaWyzwanTemat</strong></p> }
+        </section>
+    }
+    @if (!string.IsNullOrWhiteSpace(w.OpisOdbiorcow)) { <section><h2 class="h5">6. Opis odbiorców innowacji</h2><p style="white-space:pre-line">@w.OpisOdbiorcow</p></section> }
+    @if (!string.IsNullOrWhiteSpace(w.ZmianaJakaWprowadza)) { <section><h2 class="h5">7. Zmiana jaką wprowadza innowacja</h2><p style="white-space:pre-line">@w.ZmianaJakaWprowadza</p></section> }
+    @if (!string.IsNullOrWhiteSpace(w.WizjaPrzyszlosci)) { <section><h2 class="h5">8. Wizja przyszłości innowacji</h2><p style="white-space:pre-line">@w.WizjaPrzyszlosci</p></section> }
+
+    <section>
+        <h2 class="h5">9. Plan działania i koszty</h2>
+        @foreach (var okres in new[] { OkresPlanu.Przygotowawczy, OkresPlanu.TestFaza1, OkresPlanu.TestFaza2 })
+        {
+            var poz = w.Harmonogram.Where(h => h.Okres == okres).OrderBy(h => h.Lp).ToList();
+            if (poz.Count == 0) continue;
+            var naglowek = okres switch
+            {
+                OkresPlanu.Przygotowawczy => "Okres przygotowawczy",
+                OkresPlanu.TestFaza1 => "Testowanie — Faza I",
+                OkresPlanu.TestFaza2 => "Testowanie — Faza II",
+                _ => okres.ToString()
+            };
+            <h3 class="h6 mt-3">@naglowek</h3>
+            <table class="table table-sm">
+                <thead><tr><th>Działanie</th><th>Termin</th><th class="text-end">Koszt</th></tr></thead>
+                <tbody>
+                @foreach (var p in poz)
+                {
+                    <tr>
+                        <td>@p.NazwaZadania<br /><em class="small text-muted">@p.Rezultat</em></td>
+                        <td class="small">@p.Od.ToString("yyyy-MM-dd") – @p.Do.ToString("yyyy-MM-dd")</td>
+                        <td class="text-end">@p.KosztDzialania.ToString("C")</td>
+                    </tr>
+                }
+                <tr class="fw-semibold"><td colspan="2" class="text-end">Suma:</td><td class="text-end">@poz.Sum(p => p.KosztDzialania).ToString("C")</td></tr>
+                </tbody>
+            </table>
+        }
+
+        @if (w.Budzet.Count > 0)
+        {
+            <h3 class="h6 mt-3">Budżet szczegółowy</h3>
+            <table class="table table-sm">
+                <thead><tr><th>Okres</th><th>Kategoria</th><th>Opis</th><th class="text-end">Kwota</th><th class="text-end">Wkład własny</th></tr></thead>
+                <tbody>
+                @foreach (var b in w.Budzet.OrderBy(b => b.Okres).ThenBy(b => b.Lp))
+                {
+                    <tr>
+                        <td class="small">@b.Okres</td>
+                        <td>@b.Kategoria</td>
+                        <td class="small">@b.Opis</td>
+                        <td class="text-end">@b.KwotaBrutto.ToString("C")</td>
+                        <td class="text-end">@b.WkladWlasny.ToString("C")</td>
+                    </tr>
+                }
+                <tr class="fw-semibold"><td colspan="3" class="text-end">Razem:</td><td class="text-end">@w.Budzet.Sum(b => b.KwotaBrutto).ToString("C")</td><td class="text-end">@w.Budzet.Sum(b => b.WkladWlasny).ToString("C")</td></tr>
+                </tbody>
+            </table>
+        }
+    </section>
+
+    <section><h2 class="h5">10. Wnioskowana kwota grantu</h2><p class="h4">@w.WnioskowanaKwotaGrantu.ToString("C")</p></section>
+
+    @if (!string.IsNullOrWhiteSpace(w.ZespolDoswiadczenie)) { <section><h2 class="h5">11. Zespół projektowy i jego doświadczenie</h2><p style="white-space:pre-line">@w.ZespolDoswiadczenie</p></section> }
+</article>
+
+@if (w.Status == StatusWniosku.Szkic && Model.Wynik.CanSubmit)
+{
+    <form method="post" asp-page-handler="Zloz" class="my-4">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+
+        <fieldset class="mb-3">
+            <legend class="h5">12. Oświadczenia</legend>
+            <p class="small text-muted">
+                Świadomy/a odpowiedzialności karnej wynikającej z art. 297 § 1 Kodeksu karnego
+                przewidującego karę pozbawienia wolności do lat 5, oświadczam:
+            </p>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" asp-for="OswiadczenieZgoda" id="oswZgoda" required />
+                <label class="form-check-label" for="oswZgoda">
+                    <strong>Akceptuję wszystkie poniższe oświadczenia</strong> wymagane dla wybranego typu wnioskodawcy
+                    (@(w.TypWnioskodawcy == TypWnioskodawcy.OsobaFizyczna ? "osoba fizyczna" : "podmiot / grupa nieformalna")).
+                </label>
+            </div>
+            <details class="mt-2">
+                <summary>Zobacz pełną listę @oswiadczeniaDoAkceptacji.Count oświadczeń</summary>
+                <ol class="small mt-2">
+                @foreach (var o in oswiadczeniaDoAkceptacji)
+                {
+                    <li class="mb-1">@o.Tresc</li>
+                }
+                </ol>
+            </details>
+        </fieldset>
+
+        <button type="submit" class="btn btn-success btn-lg">Złóż wniosek</button>
+        <a class="btn btn-outline-secondary" asp-page="/Wnioski/Edycja" asp-route-id="@Model.Id">Wróć do edycji</a>
+    </form>
+}
+else if (w.Status == StatusWniosku.Szkic)
+{
+    <div class="alert alert-warning">
+        Wniosek nie jest kompletny. <a asp-page="/Wnioski/Kompletnosc" asp-route-id="@Model.Id">Zobacz braki</a>.
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        Wniosek został już złożony @w.ZlozonoUtc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm"). Status: <strong>@w.Status</strong>.
+    </div>
+}
+
+@section Scripts {
+    <style media="print">
+        nav, form, .btn, header .navbar, footer { display: none !important; }
+        .wniosek-print section { break-inside: avoid; }
+    </style>
+}

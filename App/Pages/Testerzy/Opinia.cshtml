@@ -1,0 +1,96 @@
+@page
+@model App.Pages.Testerzy.OpiniaModel
+@{
+    ViewData["Title"] = "Opinia testera";
+    var tytul = Model.Aplikacja?.TestSession.Idea.Karta?.Tytul ?? "innowacja";
+}
+
+<h1>Opinia testera — @tytul</h1>
+
+@if (Model.Wyslana)
+{
+    <div class="alert alert-success" role="status" aria-live="polite">
+        <strong>Dziękujemy za opinię.</strong> Twój wkład pomoże autorowi ulepszyć rozwiązanie.
+    </div>
+    return;
+}
+
+<p class="text-muted">Twoje odpowiedzi są prezentowane autorowi innowacji w podsumowaniu wyników.</p>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert" aria-live="assertive">
+        @foreach (var kv in ViewData.ModelState)
+        {
+            foreach (var e in kv.Value!.Errors) { <p class="mb-0">@e.ErrorMessage</p> }
+        }
+    </div>
+}
+
+<form method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Zgloszenie" />
+
+    <fieldset class="mb-3">
+        <legend class="form-label">1. Czy rozwiązanie odpowiada na wskazany problem?</legend>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" asp-for="Opinia.OdpowiadaNaProblem" value="true" id="op1t" required />
+            <label class="form-check-label" for="op1t">Tak</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" asp-for="Opinia.OdpowiadaNaProblem" value="false" id="op1n" />
+            <label class="form-check-label" for="op1n">Nie</label>
+        </div>
+    </fieldset>
+
+    <fieldset class="mb-3">
+        <legend class="form-label">2. Czy było łatwe w użyciu? (1 = bardzo trudne, 5 = bardzo łatwe)</legend>
+        @for (int i = 1; i <= 5; i++)
+        {
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" asp-for="Opinia.Latwosc" value="@i" id="lat-@i" required />
+                <label class="form-check-label" for="lat-@i">@i</label>
+            </div>
+        }
+    </fieldset>
+
+    <div class="mb-3">
+        <label asp-for="Opinia.CoDzialaloDobrze" class="form-label">3. Co działało dobrze?</label>
+        <textarea asp-for="Opinia.CoDzialaloDobrze" class="form-control" rows="3" required maxlength="2000"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Opinia.DoPoprawy" class="form-label">4. Co należy poprawić?</label>
+        <textarea asp-for="Opinia.DoPoprawy" class="form-control" rows="3" required maxlength="2000"></textarea>
+    </div>
+
+    <fieldset class="mb-3">
+        <legend class="form-label">5. Czy skorzystałbyś/skorzystałabyś z niego ponownie?</legend>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" asp-for="Opinia.SkorzystalbysPonownie" value="true" id="skor1" required />
+            <label class="form-check-label" for="skor1">Tak</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" asp-for="Opinia.SkorzystalbysPonownie" value="false" id="skor2" />
+            <label class="form-check-label" for="skor2">Nie</label>
+        </div>
+    </fieldset>
+
+    <div class="mb-3">
+        <label asp-for="Opinia.BariereDostepnosci" class="form-label">6. Czy wystąpiła bariera dostępności? (opcjonalnie)</label>
+        <textarea asp-for="Opinia.BariereDostepnosci" class="form-control" rows="2" maxlength="1000" placeholder="np. zbyt mały tekst, brak czytnika ekranu, brak kontrastu"></textarea>
+    </div>
+
+    <fieldset class="mb-3">
+        <legend class="form-label">Ocena ogólna (1-5)</legend>
+        @for (int i = 1; i <= 5; i++)
+        {
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" asp-for="Opinia.OcenaOgolna" value="@i" id="oc-@i" required />
+                <label class="form-check-label" for="oc-@i">@i ⭐</label>
+            </div>
+        }
+    </fieldset>
+
+    <button type="submit" class="btn btn-primary">Wyślij opinię</button>
+</form>

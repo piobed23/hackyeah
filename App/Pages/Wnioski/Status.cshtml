@@ -1,0 +1,60 @@
+@page
+@model App.Pages.Wnioski.StatusModel
+@{
+    ViewData["Title"] = "Status wniosku";
+    var w = Model.Wniosek;
+}
+
+<h1>Status wniosku</h1>
+<p class="text-muted small">Nabór: @w.Call.Nazwa</p>
+
+@await Html.PartialAsync("_WniosekMenu", (Model.Id, "status"))
+
+@if (Model.Zlozony)
+{
+    <div class="alert alert-success" role="status" aria-live="polite">
+        <strong>Wniosek złożony pomyślnie.</strong> Zostaniesz powiadomiony/-a o decyzji ROPS.
+    </div>
+}
+
+<section class="my-4">
+    <h2 class="h5">@w.TytulProjektu</h2>
+    <p>
+        <span class="badge bg-primary">@w.Status</span>
+        @if (w.ZlozonoUtc is not null)
+        {
+            <span class="text-muted small ms-2">Złożono: @w.ZlozonoUtc.Value.ToLocalTime():yyyy-MM-dd HH:mm</span>
+        }
+    </p>
+    @if (!string.IsNullOrWhiteSpace(w.WynikOceny))
+    {
+        <div class="alert alert-light border">
+            <strong>Wynik oceny ROPS:</strong>
+            <p class="mb-0">@w.WynikOceny</p>
+        </div>
+    }
+</section>
+
+<section class="my-4" aria-labelledby="historia">
+    <h2 id="historia" class="h5">Historia</h2>
+    @if (Model.Historia.Count == 0)
+    {
+        <p class="text-muted">Brak wpisów w historii.</p>
+    }
+    else
+    {
+        <ol class="list-unstyled">
+        @foreach (var h in Model.Historia)
+        {
+            <li class="border-start border-3 ps-3 mb-2">
+                <strong>@h.Akcja</strong>
+                <span class="small text-muted">— @h.KiedyUtc.ToLocalTime():yyyy-MM-dd HH:mm</span>
+                @if (h.Uzytkownik is not null)
+                {
+                    <span class="small text-muted"> · @h.Uzytkownik.Imie @h.Uzytkownik.Nazwisko</span>
+                }
+            </li>
+        }
+        </ol>
+    }
+</section>
