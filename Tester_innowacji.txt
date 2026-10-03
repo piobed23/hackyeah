@@ -1,0 +1,285 @@
+Tak — uprośćmy to mocno. Nie potrzebujemy osobnego rozbudowanego systemu rekrutacji zarządzanego przez ROPS. Osoby zgłaszające się do testów trafiają bezpośrednio do panelu autora innowacji.
+
+ROPS zachowuje podgląd administracyjny, ale nie musi ręcznie obsługiwać każdego testera.
+
+## Uproszczone flow Testera innowacji
+
+```text
+Autor ma zaakceptowaną fiszkę pomysłu
+                    ↓
+Klika „Rozpocznij testowanie”
+                    ↓
+Uzupełnia krótki opis testu
+                    ↓
+Na publicznej karcie pojawia się:
+„Ta innowacja szuka testerów”
+                    ↓
+Zainteresowany użytkownik klika:
+„Chcę przetestować”
+                    ↓
+Wypełnia krótki formularz
+                    ↓
+Zgłoszenie trafia do panelu autora
+                    ↓
+Autor akceptuje albo odrzuca zgłoszenie
+                    ↓
+Zaakceptowany tester otrzymuje instrukcję
+                    ↓
+Odbywa się test
+                    ↓
+Tester wypełnia krótki formularz opinii
+                    ↓
+Autor widzi wyniki w swoim panelu
+                    ↓
+Autor poprawia rozwiązanie albo kończy test
+                    ↓
+ROPS zatwierdza zmianę statusu innowacji
+```
+
+# Dokładny przebieg
+
+## 1. Autor uruchamia testowanie
+
+Na karcie swojej innowacji autor klika:
+
+> Rozpocznij testowanie
+
+Wypełnia tylko najważniejsze informacje:
+
+- co będzie testowane;
+- kogo poszukuje;
+- ilu testerów potrzebuje;
+- czy test jest zdalny, czy stacjonarny;
+- termin;
+- ile czasu zajmuje;
+- krótka instrukcja;
+- ewentualne wymagania.
+
+Nie tworzymy osobnego skomplikowanego planu testów.
+
+Status innowacji:
+
+> Poszukuje testerów
+
+## 2. System pokazuje test odpowiednim osobom
+
+Informacja pojawia się:
+
+- na publicznej karcie innowacji;
+- na prostej liście „Innowacje do testowania”;
+- osobom obserwującym powiązany problem;
+- osobom, które wcześniej wybrały „Powiadom mnie o testach”.
+
+W głównym flow problemu można pokazać:
+
+> Powstaje rozwiązanie dotyczące podobnego problemu. Autor poszukuje testerów.
+
+Przycisk:
+
+> Zgłoś się do testowania
+
+## 3. Użytkownik zgłasza chęć udziału
+
+Formularz powinien być bardzo krótki:
+
+- imię lub nazwa profilu;
+- dlaczego chce uczestniczyć — opcjonalnie;
+- preferowany sposób kontaktu;
+- potrzebne udogodnienia — opcjonalnie;
+- zgoda na przekazanie danych autorowi innowacji.
+
+Po wysłaniu:
+
+> Twoje zgłoszenie zostało przekazane autorowi innowacji.
+
+Nie tworzymy wieloetapowej rekrutacji.
+
+## 4. Zgłoszenia pojawiają się w panelu autora
+
+Autor wchodzi w swoją innowację i otwiera zakładkę:
+
+> Testerzy
+
+Widoczna jest prosta tabela:
+
+| Osoba | Data zgłoszenia | Informacja | Status | Działanie |
+|---|---|---|---|---|
+| Anna K. | 3.10 | Chce przetestować aplikację | Nowe | Akceptuj / Odrzuć |
+| Marek P. | 3.10 | Potrzebuje większego tekstu | Nowe | Akceptuj / Odrzuć |
+
+Autor może:
+
+- zaakceptować;
+- odrzucić;
+- wysłać wiadomość przez platformę;
+- oznaczyć udział jako zakończony.
+
+Administrator ROPS ma podgląd tej samej listy, ale nie musi wykonywać działań za autora.
+
+Dane testerów widzi autor tylko wtedy, gdy tester świadomie wyraził na to zgodę.
+
+## 5. Autor akceptuje testera
+
+Po zaakceptowaniu użytkownik otrzymuje:
+
+- potwierdzenie;
+- instrukcję;
+- termin;
+- miejsce albo link;
+- informację, jak przekazać opinię.
+
+Status:
+
+> Przyjęty do testu
+
+Nie budujemy osobnego kalendarza. Termin i instrukcja mogą być zwykłą wiadomością.
+
+## 6. Przeprowadzenie testu
+
+Test odbywa się poza platformą albo bezpośrednio w testowanej aplikacji.
+
+Platforma przechowuje tylko:
+
+- uczestników;
+- instrukcję;
+- status udziału;
+- późniejszą opinię.
+
+Autor po zakończeniu oznacza:
+
+> Test wykonany — poproś o opinię
+
+System automatycznie wysyła testerowi formularz.
+
+## 7. Krótka opinia testera
+
+Tester odpowiada:
+
+1. Czy rozwiązanie odpowiada na wskazany problem?
+2. Czy było łatwe w użyciu?
+3. Co działało dobrze?
+4. Co należy poprawić?
+5. Czy skorzystałbyś z niego ponownie?
+6. Czy wystąpiła bariera dostępności?
+
+Może też wystawić prostą ocenę, np. od 1 do 5.
+
+Nie tworzymy osobnych, konfigurowalnych ankiet dla każdego projektu. W MVP każdy test korzysta z tego samego formularza.
+
+## 8. Wyniki w panelu autora
+
+Autor widzi:
+
+- liczbę zgłoszonych osób;
+- liczbę zaakceptowanych;
+- liczbę zakończonych testów;
+- średnią ocenę;
+- odpowiedzi tekstowe;
+- zgłoszone bariery;
+- najczęstsze problemy.
+
+Wystarczy prosty widok:
+
+```text
+Zgłoszenia: 18
+Przyjęci testerzy: 10
+Zakończone testy: 7
+Średnia ocena: 4,2/5
+
+Najczęściej zgłaszane:
+– zbyt mały tekst,
+– niejasny pierwszy krok,
+– brak możliwości powrotu.
+```
+
+Na MVP nie potrzebujemy automatycznego podsumowania AI. Można je dopisać później.
+
+## 9. Zakończenie testowania
+
+Autor wybiera:
+
+- „Wprowadzam poprawki”;
+- „Potrzebuję kolejnych testerów”;
+- „Zakończ testowanie”.
+
+Jeżeli wybiera poprawki, status zmienia się na:
+
+> W poprawie
+
+Jeżeli chce kontynuować:
+
+> Poszukuje testerów
+
+Jeżeli kończy:
+
+> Testy zakończone — oczekuje na zatwierdzenie ROPS
+
+ROPS sprawdza podstawowe wyniki i zatwierdza status:
+
+> Przetestowana innowacja
+
+# Minimalne widoki
+
+Nie potrzebujemy dwudziestu ekranów. Wystarczy sześć:
+
+1. **Formularz „Rozpocznij testowanie”**  
+   Może być modalem na karcie innowacji.
+
+2. **Lista innowacji szukających testerów**  
+   Proste karty i filtry.
+
+3. **Publiczna karta innowacji**  
+   Z przyciskiem „Chcę przetestować”.
+
+4. **Krótki formularz zgłoszenia**  
+   Również jako modal.
+
+5. **Zakładka „Testerzy” w panelu autora**  
+   Lista zgłoszeń, akceptacja i statusy.
+
+6. **Formularz opinii oraz proste podsumowanie wyników**  
+   Jeden formularz dla testera i jedna sekcja wyników dla autora.
+
+## Co wykorzystujemy z istniejącego systemu
+
+Żeby zmniejszyć pracę, nie budujemy wszystkiego od zera:
+
+- publiczna karta to ta sama karta innowacji z Kreatora;
+- konto autora już istnieje;
+- powiadomienia wykorzystują mechanizm całej platformy;
+- lista testerów jest zakładką w panelu autora;
+- komunikacja wykorzystuje moduł komunikacji;
+- status testowania jest kolejnym statusem innowacji;
+- zgłoszone problemy dostarczają potencjalnych testerów;
+- ROPS korzysta z istniejącego panelu administratora.
+
+## Ostateczne uproszczone statusy
+
+### Test
+
+```text
+Nie rozpoczęto
+→ Poszukuje testerów
+→ W trakcie testów
+→ W poprawie
+→ Testy zakończone
+→ Zatwierdzone przez ROPS
+```
+
+### Tester
+
+```text
+Nowe zgłoszenie
+→ Przyjęty / Odrzucony
+→ Test wykonany
+→ Opinia przesłana
+```
+
+To nadal spełnia wszystkie cztery wymagania modułu:
+
+- można zgłosić się do testów;
+- można ocenić rozwiązanie;
+- można przekazać informację zwrotną;
+- można zaproponować usprawnienia.
+
+Jednocześnie większość funkcji jest tylko rozszerzeniem istniejącej karty innowacji i panelu autora, więc zakres pozostaje rozsądny.
