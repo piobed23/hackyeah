@@ -1,0 +1,105 @@
+@page
+@model App.Pages.Rops.ProblemyModel
+@{
+    ViewData["Title"] = "Problemy mieszkańców";
+}
+
+<h1>Problemy mieszkańców</h1>
+<p class="text-muted">
+    Zgłoszenia przez mieszkańców + automatyczna agregacja luk społecznych (brak gotowego rozwiązania).
+</p>
+
+<section class="my-4" aria-labelledby="s-luki">
+    <h2 id="s-luki" class="h5">Luki społeczne — zgłoszenia bez znalezionego rozwiązania (@Model.KlasteryLuk.Sum(g => g.Count()))</h2>
+    @if (Model.KlasteryLuk.Count == 0)
+    {
+        <p class="text-muted">Brak zidentyfikowanych luk.</p>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var klaster in Model.KlasteryLuk)
+            {
+                <div class="col-md-6">
+                    <article class="card border-danger h-100">
+                        <div class="card-body">
+                            <h3 class="h6">
+                                Klaster „@klaster.Key"
+                                <span class="badge bg-danger ms-1">@klaster.Count() zgłoszeń</span>
+                            </h3>
+                            <ul class="small mb-0">
+                                @foreach (var p in klaster.Take(5))
+                                {
+                                    <li>
+                                        <strong>@p.Tytul</strong>
+                                        @if (!string.IsNullOrWhiteSpace(p.Lokalizacja)) { <span class="text-muted">— @p.Lokalizacja</span> }
+                                        <br />
+                                        <span class="small text-muted">@p.UtworzonoUtc.ToLocalTime().ToString("yyyy-MM-dd")</span>
+                                    </li>
+                                }
+                                @if (klaster.Count() > 5) { <li class="text-muted">i @(klaster.Count() - 5) kolejnych…</li> }
+                            </ul>
+                        </div>
+                    </article>
+                </div>
+            }
+        </div>
+        <p class="small text-muted mt-2">
+            Klastry wygenerowane po głównym tagu zgłoszenia. Rozważ zaproszenie autora do zaproponowania innowacji.
+        </p>
+    }
+</section>
+
+<section class="my-4" aria-labelledby="s-nowe">
+    <h2 id="s-nowe" class="h5">Nowe zgłoszenia (@Model.Nowe.Count)</h2>
+    @if (Model.Nowe.Count == 0)
+    {
+        <p class="text-muted">Brak.</p>
+    }
+    else
+    {
+        <ul class="list-group">
+        @foreach (var p in Model.Nowe)
+        {
+            <li class="list-group-item">
+                <strong>@p.Tytul</strong>
+                <span class="badge bg-info text-dark ms-1">@p.Status</span>
+                <p class="small mb-1 text-muted">
+                    @p.Mieszkaniec.Imie @p.Mieszkaniec.Nazwisko · @p.UtworzonoUtc.ToLocalTime():yyyy-MM-dd
+                    @if (!string.IsNullOrWhiteSpace(p.Lokalizacja)) { <span>· @p.Lokalizacja</span> }
+                </p>
+                <p class="small mb-0">@p.Opis</p>
+            </li>
+        }
+        </ul>
+    }
+</section>
+
+<section class="my-4" aria-labelledby="s-dop">
+    <h2 id="s-dop" class="h5">Dopasowane do istniejącej innowacji (@Model.Dopasowane.Count)</h2>
+    @if (Model.Dopasowane.Count == 0)
+    {
+        <p class="text-muted">Brak.</p>
+    }
+    else
+    {
+        <ul class="list-group">
+        @foreach (var p in Model.Dopasowane)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div>
+                    <strong>@p.Tytul</strong>
+                    @if (p.PowiazanaIdea?.Karta is not null)
+                    {
+                        <br /><span class="small">→ @p.PowiazanaIdea.Karta.Tytul</span>
+                    }
+                </div>
+                @if (p.PowiazanaIdeaId is not null)
+                {
+                    <a class="btn btn-sm btn-outline-primary" asp-page="/Publiczne/Karta" asp-route-id="@p.PowiazanaIdeaId">Rozwiązanie</a>
+                }
+            </li>
+        }
+        </ul>
+    }
+</section>

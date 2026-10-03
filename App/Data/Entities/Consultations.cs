@@ -71,8 +71,24 @@ public class ProblemReport
     [MaxLength(500)]
     public string Tagi { get; set; } = "";
 
+    [MaxLength(1000)]
+    public string? KogoDotyczy { get; set; }
+
+    [MaxLength(1000)]
+    public string? Skutki { get; set; }
+
+    [MaxLength(1000)]
+    public string? CoProbowano { get; set; }
+
+    [MaxLength(1000)]
+    public string? OczekiwanyEfekt { get; set; }
+
+    public App.Infrastructure.Enums.StatusProblemu Status { get; set; } = App.Infrastructure.Enums.StatusProblemu.Zgloszony;
+
     public int? PowiazanaIdeaId { get; set; }
     public Idea? PowiazanaIdea { get; set; }
+
+    public bool PowiadamiajORozwiazaniu { get; set; }
 
     public DateTime UtworzonoUtc { get; set; } = DateTime.UtcNow;
 }

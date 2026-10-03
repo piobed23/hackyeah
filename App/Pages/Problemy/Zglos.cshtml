@@ -1,0 +1,74 @@
+@page
+@model App.Pages.Problemy.ZglosModel
+@{
+    ViewData["Title"] = "Zgłoś problem";
+}
+
+<h1 id="krok-heading" tabindex="-1">Opisz problem, który Cię dotyczy</h1>
+<p class="text-muted">
+    Opisz sytuację własnymi słowami. Nie musisz znać nazw urzędowych.
+    Zaraz sprawdzimy, czy ktoś już nad tym pracuje i pokażemy pasujące rozwiązania.
+</p>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert" aria-live="assertive">
+        @foreach (var kv in ViewData.ModelState)
+        {
+            foreach (var e in kv.Value!.Errors) { <p class="mb-0">@e.ErrorMessage</p> }
+        }
+    </div>
+}
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label asp-for="Problem.Tytul" class="form-label">1. Krótko: czego dotyczy problem?</label>
+        <input asp-for="Problem.Tytul" class="form-control" required maxlength="200" aria-describedby="h-tyt" autofocus />
+        <div id="h-tyt" class="form-text">Jedno zdanie, własnymi słowami. Np. „Starsi sąsiedzi nie mają jak dojechać do lekarza"</div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Problem.Opis" class="form-label">2. Opisz sytuację szerzej</label>
+        <textarea asp-for="Problem.Opis" class="form-control" rows="5" required maxlength="4000" aria-describedby="h-opis"></textarea>
+        <div id="h-opis" class="form-text">Co obserwujesz? Od kiedy? Jak często? Czy to narasta?</div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="Problem.KogoDotyczy" class="form-label">3. Kogo problem dotyczy?</label>
+            <textarea asp-for="Problem.KogoDotyczy" class="form-control" rows="3" maxlength="1000" placeholder="np. seniorzy 70+, rodziny z dziećmi w mojej gminie"></textarea>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Problem.Lokalizacja" class="form-label">4. Gdzie występuje?</label>
+            <input asp-for="Problem.Lokalizacja" class="form-control" maxlength="200" placeholder="np. Gmina Myślenice, powiat suski" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Problem.Skutki" class="form-label">5. Jakie są skutki?</label>
+            <textarea asp-for="Problem.Skutki" class="form-control" rows="3" maxlength="1000" placeholder="co się dzieje bo problem nie jest rozwiązany"></textarea>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Problem.CoProbowano" class="form-label">6. Co już próbowano (opcjonalnie)?</label>
+            <textarea asp-for="Problem.CoProbowano" class="form-control" rows="3" maxlength="1000"></textarea>
+        </div>
+        <div class="col-12">
+            <label asp-for="Problem.OczekiwanyEfekt" class="form-label">7. Jaki efekt byłby satysfakcjonujący?</label>
+            <textarea asp-for="Problem.OczekiwanyEfekt" class="form-control" rows="3" maxlength="1000" placeholder="co by się musiało wydarzyć żeby ten problem przestał być problemem"></textarea>
+        </div>
+        <div class="col-12">
+            <label asp-for="Problem.Tagi" class="form-label">8. Słowa kluczowe (po przecinku)</label>
+            <input asp-for="Problem.Tagi" class="form-control" maxlength="500" placeholder="np. seniorzy, transport, zdrowie, wieś" />
+        </div>
+    </div>
+
+    <div class="form-check my-3">
+        <input class="form-check-input" type="checkbox" asp-for="Powiadamiaj" id="pow" />
+        <label class="form-check-label" for="pow">
+            Powiadom mnie, gdy pojawi się rozwiązanie tego problemu.
+        </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Wyślij i zobacz dopasowania</button>
+    <a class="btn btn-outline-secondary" asp-page="/Index">Anuluj</a>
+</form>

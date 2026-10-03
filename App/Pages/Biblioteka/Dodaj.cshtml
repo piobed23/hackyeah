@@ -1,0 +1,104 @@
+@page
+@using App.Infrastructure.Enums
+@model App.Pages.Biblioteka.DodajModel
+@{
+    ViewData["Title"] = "Zaproponuj materiał";
+}
+
+<h1>Zaproponuj materiał do Biblioteki</h1>
+<p class="text-muted">Materiał zostanie opublikowany po weryfikacji przez pracownika ROPS. Preferowane są linki do publicznie dostępnych źródeł.</p>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger" role="alert" aria-live="assertive">
+        @foreach (var kv in ViewData.ModelState)
+        {
+            foreach (var e in kv.Value!.Errors) { <p class="mb-0">@e.ErrorMessage</p> }
+        }
+    </div>
+}
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="row g-3">
+        <div class="col-md-8">
+            <label asp-for="Material.Tytul" class="form-label">Tytuł</label>
+            <input asp-for="Material.Tytul" class="form-control" required maxlength="200" />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Material.Typ" class="form-label">Typ materiału</label>
+            <select asp-for="Material.Typ" class="form-select" required>
+                @foreach (var t in Enum.GetValues<TypMaterialu>())
+                {
+                    <option value="@t">@App.Pages.Biblioteka.IndexModel.NazwaTypu(t)</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Material.Obszary" class="form-label">Obszary tematyczne (po przecinku)</label>
+            <input asp-for="Material.Obszary" class="form-control" maxlength="500" placeholder="np. seniorzy, zdrowie psychiczne" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Material.ZasiegGeograficzny" class="form-label">Zasięg geograficzny</label>
+            <input asp-for="Material.ZasiegGeograficzny" class="form-control" maxlength="200" placeholder="np. Małopolska, cała Polska" />
+        </div>
+
+        <div class="col-12">
+            <label asp-for="Material.KrotkiOpis" class="form-label">Krótki opis (1-3 zdania)</label>
+            <textarea asp-for="Material.KrotkiOpis" class="form-control" rows="2" required maxlength="500"></textarea>
+        </div>
+        <div class="col-12">
+            <label asp-for="Material.OpisPelny" class="form-label">Opis pełny</label>
+            <textarea asp-for="Material.OpisPelny" class="form-control" rows="5" maxlength="4000"></textarea>
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Material.GrupaOdbiorcow" class="form-label">Grupa odbiorców</label>
+            <input asp-for="Material.GrupaOdbiorcow" class="form-control" maxlength="500" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Material.Tagi" class="form-label">Słowa kluczowe</label>
+            <input asp-for="Material.Tagi" class="form-control" maxlength="500" />
+        </div>
+
+        <div class="col-md-6">
+            <label asp-for="Material.AutorNazwa" class="form-label">Autor materiału (imię, nazwisko lub organizacja)</label>
+            <input asp-for="Material.AutorNazwa" class="form-control" maxlength="200" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Material.Zrodlo" class="form-label">Źródło</label>
+            <input asp-for="Material.Zrodlo" class="form-control" maxlength="300" placeholder="np. ROPS Kraków, GUS, własne opracowanie" />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Material.Link" class="form-label">Link do materiału</label>
+            <input asp-for="Material.Link" type="url" class="form-control" maxlength="500" placeholder="https://..." />
+        </div>
+        <div class="col-md-6">
+            <label asp-for="Material.Licencja" class="form-label">Licencja (opcjonalnie)</label>
+            <input asp-for="Material.Licencja" class="form-control" maxlength="200" placeholder="np. CC BY 4.0, publicznie dostępne" />
+        </div>
+    </div>
+
+    <fieldset class="my-4">
+        <legend class="h6">Prawa i widoczność</legend>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" asp-for="Material.PotwierdzeniePraw" id="pp" required />
+            <label class="form-check-label" for="pp">
+                <strong>Potwierdzam, że mam prawo udostępnić ten materiał</strong> lub wskazać jego publiczne źródło,
+                a podane informacje są zgodne z moją wiedzą.
+            </label>
+        </div>
+        <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" asp-for="Material.AutorPubliczny" id="ap" />
+            <label class="form-check-label" for="ap">
+                Zgadzam się, aby nazwa autora była widoczna publicznie.
+                <br />
+                <span class="small text-muted">Jeśli odznaczysz, ROPS będzie znał autora, ale publicznie pojawi się „anonimowo".</span>
+            </label>
+        </div>
+    </fieldset>
+
+    <button type="submit" class="btn btn-primary">Wyślij do weryfikacji</button>
+    <a class="btn btn-outline-secondary" asp-page="/Biblioteka/Index">Anuluj</a>
+</form>

@@ -20,4 +20,16 @@ public class User
 
     [MaxLength(200)]
     public string? Organizacja { get; set; }
+
+    // Pola dla roli Instytucja (zweryfikowane konto)
+    [MaxLength(100)]
+    public string? TypInstytucji { get; set; }
+
+    [MaxLength(200)]
+    public string? Lokalizacja { get; set; }
+
+    [MaxLength(1000)]
+    public string? ZasobyDomyslne { get; set; }
+
+    public bool Zweryfikowana { get; set; }
 }

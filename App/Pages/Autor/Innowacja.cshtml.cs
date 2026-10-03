@@ -25,6 +25,7 @@ public class InnowacjaModel : PageModel
     public TestSession? AktywnaSesja { get; private set; }
     public int LiczbaZgloszen { get; private set; }
     public int LiczbaOpinii { get; private set; }
+    public List<ImplementationCard> PytaniaOdInstytucji { get; private set; } = new();
 
     [BindProperty] public TestSession NowaSesja { get; set; } = new()
     {
@@ -37,6 +38,27 @@ public class InnowacjaModel : PageModel
     {
         if (!await WczytajAsync()) return NotFound();
         return Page();
+    }
+
+    [BindProperty] public int KartaWdrozeniaId { get; set; }
+    [BindProperty] public string? Odpowiedz { get; set; }
+
+    public async Task<IActionResult> OnPostOdpowiedzAsync()
+    {
+        var k = await _db.ImplementationCards.FirstOrDefaultAsync(x => x.Id == KartaWdrozeniaId);
+        if (k is null) return NotFound();
+        if (string.IsNullOrWhiteSpace(Odpowiedz)) return RedirectToPage(new { id = Id });
+        k.OdpowiedzAutora = Odpowiedz;
+        k.OdpowiedzUtc = DateTime.UtcNow;
+        _db.AuditLog.Add(new AuditLogEntry
+        {
+            UzytkownikId = _auth.GetUser()?.Id,
+            Akcja = "MIDDLEMAN_ODPOWIEDZ_AUTORA",
+            EncjaTyp = nameof(ImplementationCard),
+            EncjaId = k.Id
+        });
+        await _db.SaveChangesAsync();
+        return RedirectToPage(new { id = Id });
     }
 
     public async Task<IActionResult> OnPostRozpocznijAsync()
@@ -86,6 +108,13 @@ public class InnowacjaModel : PageModel
             || t.Status == StatusSesjiTestowej.WPoprawie);
         LiczbaZgloszen = AktywnaSesja?.Zgloszenia.Count ?? 0;
         LiczbaOpinii = AktywnaSesja?.Zgloszenia.Count(z => z.Opinia is not null) ?? 0;
+
+        PytaniaOdInstytucji = await _db.ImplementationCards
+            .Include(k => k.InstytucjaUser)
+            .Where(k => k.IdeaId == Id && k.PytanieDoAutora != null)
+            .OrderByDescending(k => k.PytanieWyslaneUtc)
+            .ToListAsync();
+
         return true;
     }
 }

@@ -18,8 +18,20 @@ public static class DemoSeeder
         var mieszkaniec = new User { Imie = "Paweł", Nazwisko = "Zieliński", Email = "mieszkaniec@demo", Rola = RolaUzytkownika.Mieszkaniec };
         var ekspert = new User { Imie = "Dr Joanna", Nazwisko = "Lewandowska", Email = "ekspert@demo", Rola = RolaUzytkownika.Ekspert, Organizacja = "UJ, Instytut Socjologii" };
         var admin = new User { Imie = "Tomasz", Nazwisko = "Admin", Email = "admin@demo", Rola = RolaUzytkownika.Admin };
+        var instytucja = new User
+        {
+            Imie = "Barbara",
+            Nazwisko = "Dyrektor",
+            Email = "cus@demo",
+            Rola = RolaUzytkownika.Instytucja,
+            Organizacja = "CUS Gmina Demo",
+            TypInstytucji = "Centrum Usług Społecznych",
+            Lokalizacja = "Gmina Demo, powiat myślenicki",
+            ZasobyDomyslne = "1 koordynator, 5 wolontariuszy, 1 sala konferencyjna, budżet operacyjny",
+            Zweryfikowana = true
+        };
 
-        db.Users.AddRange(rops, autor1, autor2, mieszkaniec, ekspert, admin);
+        db.Users.AddRange(rops, autor1, autor2, mieszkaniec, ekspert, admin, instytucja);
         await db.SaveChangesAsync();
 
         var nabor = new Call
@@ -117,6 +129,57 @@ public static class DemoSeeder
             Opis = "W przedszkolu dzieci przychodzą zimą w nieodpowiednich kurtkach. Rodzice nie mają pieniędzy.",
             Tagi = "ubóstwo,dzieci"
         });
+
+        db.LibraryItems.AddRange(
+            new LibraryItem
+            {
+                Tytul = "Mapa Wyzwań Społecznych Małopolski 2026",
+                Typ = TypMaterialu.Raport,
+                Status = StatusMaterialu.Opublikowany,
+                Obszary = "seniorzy,ubóstwo,zdrowie psychiczne,wykluczenie cyfrowe",
+                KrotkiOpis = "Zbiorczy raport ROPS Kraków z diagnozą kluczowych wyzwań społecznych regionu.",
+                OpisPelny = "Dokument stanowi podstawę do planowania działań w ramach FERS 5.1 i innych instrumentów. Zawiera dane statystyczne, analizę trendów oraz rekomendacje.",
+                AutorNazwa = "Regionalny Ośrodek Polityki Społecznej w Krakowie",
+                Zrodlo = "ROPS Kraków",
+                Link = "https://rops.krakow.pl/",
+                Tagi = "mapa,diagnoza,strategia,małopolska",
+                ZasiegGeograficzny = "Województwo Małopolskie",
+                PotwierdzeniePraw = true,
+                AutorPubliczny = true,
+                ZglaszajacyUserId = rops.Id,
+                OpublikowanoUtc = DateTime.UtcNow.AddMonths(-2)
+            },
+            new LibraryItem
+            {
+                Tytul = "Canvas Innowacji Społecznej",
+                Typ = TypMaterialu.CanvasSzablon,
+                Status = StatusMaterialu.Opublikowany,
+                Obszary = "metodologia",
+                KrotkiOpis = "Szablon do uporządkowania pomysłu na innowację — jednostronicowy canvas.",
+                OpisPelny = "Pomaga ustrukturyzować: problem, odbiorców, propozycję wartości, zasoby, kanały dotarcia, mierniki.",
+                AutorNazwa = "INNOAGH",
+                Zrodlo = "Krakowskie Centrum Innowacyjnych Technologii INNOAGH",
+                Link = "https://innoagh.pl/",
+                Tagi = "canvas,metodologia,prototypowanie",
+                PotwierdzeniePraw = true,
+                AutorPubliczny = true,
+                ZglaszajacyUserId = rops.Id,
+                OpublikowanoUtc = DateTime.UtcNow.AddMonths(-1)
+            },
+            new LibraryItem
+            {
+                Tytul = "Jak zbudować wolontariat senioralny — poradnik",
+                Typ = TypMaterialu.Poradnik,
+                Status = StatusMaterialu.OczekujeNaWeryfikacje,
+                Obszary = "seniorzy,wolontariat",
+                KrotkiOpis = "Krok po kroku: rekrutacja wolontariuszy, szkolenie, pierwszy miesiąc działania.",
+                AutorNazwa = "Fundacja Senior+",
+                Tagi = "wolontariat,seniorzy,rekrutacja",
+                PotwierdzeniePraw = true,
+                AutorPubliczny = true,
+                ZglaszajacyUserId = autor1.Id
+            }
+        );
 
         await db.SaveChangesAsync();
     }

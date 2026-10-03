@@ -1,7 +1,8 @@
 @page
 @model App.Pages.Nabory.SzczegolyModel
 @{
-    ViewData["Title"] = Model.Nabor!.Nazwa;
+    if (Model.Nabor is null) { return; }
+    ViewData["Title"] = Model.Nabor.Nazwa;
 }
 
 <nav aria-label="okruszki" class="mb-2">

@@ -1,0 +1,152 @@
+@page
+@model App.Pages.Middleman.KartaModel
+@{
+    ViewData["Title"] = "Middleman — karta wdrożenia";
+}
+
+<nav aria-label="okruszki" class="mb-2">
+    <a asp-page="/Middleman/Warianty" asp-route-id="@Model.Id" class="small">← Warianty</a>
+</nav>
+
+<h1>Karta wdrożenia</h1>
+<p class="text-muted">
+    Innowacja: <strong>„@Model.Innowacja.Karta?.Tytul"</strong> ·
+    Instytucja: <strong>@Model.Karta.NazwaInstytucji</strong> ·
+    Wybrany wariant: <strong>@Model.Wariant?.Nazwa</strong>
+</p>
+
+<ol class="list-unstyled d-flex gap-2 small flex-wrap mb-4" aria-label="Postęp">
+    <li><a class="badge bg-success text-decoration-none" asp-page="/Middleman/Dane" asp-route-id="@Model.Id">1. Dane</a></li>
+    <li><a class="badge bg-success text-decoration-none" asp-page="/Middleman/Warianty" asp-route-id="@Model.Id">2. Warianty</a></li>
+    <li aria-current="step"><span class="badge bg-primary">Krok 3 z 3: Karta wdrożenia</span></li>
+</ol>
+
+@if (Model.Karta.Status == App.Infrastructure.Enums.StatusWdrozenia.Zatwierdzony)
+{
+    <div class="alert alert-success" role="status" aria-live="polite">
+        Karta zatwierdzona przez instytucję @Model.Karta.ZatwierdzonoUtc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm").
+    </div>
+}
+
+@if (TempData["Komunikat"] is string tdm)
+{
+    <div class="alert alert-info" role="status" aria-live="polite">@tdm</div>
+}
+
+<section class="row g-3">
+    <div class="col-lg-8">
+        <article class="card">
+            <div class="card-header"><h2 class="h6 mb-0">Treść karty wdrożenia (Markdown — edytowalny)</h2></div>
+            <div class="card-body">
+                <form method="post" asp-page-handler="Zapisz">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <label asp-for="EdytowanaKarta" class="visually-hidden">Treść karty wdrożenia</label>
+                    <textarea asp-for="EdytowanaKarta" class="form-control font-monospace" rows="25" style="font-size: .9rem;"></textarea>
+                    <div class="mt-2 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+                    </div>
+                </form>
+            </div>
+        </article>
+    </div>
+
+    <div class="col-lg-4">
+        <aside class="card bg-light border-0 mb-3">
+            <div class="card-body">
+                <h2 class="h6 text-primary">Brakujący partnerzy</h2>
+                @if (Model.BrakujacyPartnerzy.Count == 0)
+                {
+                    <p class="small text-muted mb-0">Nic do uzupełnienia.</p>
+                }
+                else
+                {
+                    <ul class="small">
+                        @foreach (var p in Model.BrakujacyPartnerzy) { <li>@p</li> }
+                    </ul>
+                    <p class="small text-muted mb-0">
+                        ROPS może zaproponować kontakt z organizacjami o tej specjalizacji (poza MVP).
+                    </p>
+                }
+            </div>
+        </aside>
+
+        <aside class="card bg-light border-0">
+            <div class="card-body">
+                <h2 class="h6 text-primary">Pasujące nabory</h2>
+                @if (Model.PasujaceNabory.Count == 0)
+                {
+                    <p class="small text-muted mb-0">Brak aktywnych naborów.</p>
+                }
+                else
+                {
+                    <ul class="small list-unstyled">
+                        @foreach (var n in Model.PasujaceNabory)
+                        {
+                            <li class="mb-2">
+                                <strong>@n.Nazwa</strong><br />
+                                <span class="text-muted">do @n.BudzetMaks.ToString("C0") · zamyka @n.DataZamkniecia:yyyy-MM-dd</span><br />
+                                <form method="post" asp-page="/Wnioski/Generuj" asp-route-ideaId="@Model.Innowacja.Id" asp-route-callId="@n.Id" class="mt-1">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Utwórz wniosek z tego planu</button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </aside>
+
+        @if (Model.Karta.Status == App.Infrastructure.Enums.StatusWdrozenia.Szkic)
+        {
+            <form method="post" asp-page-handler="Zatwierdz" class="mt-3">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                <button type="submit" class="btn btn-success w-100">Zatwierdź kartę wdrożenia</button>
+            </form>
+        }
+
+        <aside class="card bg-light border-0 mt-3">
+            <div class="card-body">
+                <h2 class="h6 text-primary">Konsultacja z autorem</h2>
+                @if (string.IsNullOrWhiteSpace(Model.Karta.PytanieDoAutora))
+                {
+                    <details>
+                        <summary class="btn btn-sm btn-outline-primary">Poproś autora o konsultację</summary>
+                        <form method="post" asp-page-handler="PytajAutora" class="mt-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="Id" />
+                            <label for="pyt" class="form-label">Pytanie do autora</label>
+                            <textarea id="pyt" name="PytanieDoAutora" class="form-control" rows="3" required maxlength="2000"
+                                      placeholder="np. Które elementy muszą pozostać niezmienione przy wdrożeniu na wsi?"></textarea>
+                            <button type="submit" class="btn btn-sm btn-primary mt-2">Wyślij przez platformę</button>
+                        </form>
+                        <p class="small text-muted mt-2 mb-0">
+                            Autor zobaczy nazwę Twojej instytucji, nazwę innowacji, krótki opis wdrożenia i Twoje pytanie.
+                            Dane kontaktowe nie są automatycznie publikowane.
+                        </p>
+                    </details>
+                }
+                else
+                {
+                    <p class="small"><strong>Pytanie wysłane @Model.Karta.PytanieWyslaneUtc?.ToLocalTime():yyyy-MM-dd HH:mm</strong></p>
+                    <p class="small">@Model.Karta.PytanieDoAutora</p>
+                    @if (!string.IsNullOrWhiteSpace(Model.Karta.OdpowiedzAutora))
+                    {
+                        <p class="small"><strong>Odpowiedź autora:</strong></p>
+                        <p class="small">@Model.Karta.OdpowiedzAutora</p>
+                    }
+                    else
+                    {
+                        <p class="small text-muted mb-0">Oczekuje na odpowiedź autora.</p>
+                    }
+                }
+            </div>
+        </aside>
+    </div>
+</section>
+
+<p class="small text-muted mt-4">
+    Plan przygotowany przy wsparciu AI i zatwierdzony przez instytucję.
+    Nie stanowi formalnego zatwierdzenia przez ROPS.
+</p>

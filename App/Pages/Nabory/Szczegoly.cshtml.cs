@@ -27,7 +27,11 @@ public class SzczegolyModel : PageModel
     public async Task<IActionResult> OnGetAsync()
     {
         Nabor = await _db.Calls.FirstOrDefaultAsync(c => c.Id == Id);
-        if (Nabor is null) return NotFound();
+        if (Nabor is null)
+        {
+            TempData["Komunikat"] = $"Nabór nr {Id} nie istnieje lub został usunięty.";
+            return RedirectToPage("/Nabory/Index");
+        }
 
         var user = _auth.GetUser();
         if (user is not null)

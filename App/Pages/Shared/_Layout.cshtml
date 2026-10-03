@@ -29,6 +29,7 @@
                 <div class="collapse navbar-collapse" id="navMain">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item"><a class="nav-link" asp-page="/Index">Start</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-page="/Problemy/Zglos">Zgłoś problem</a></li>
                         @if (rola == RolaUzytkownika.Autor || rola == RolaUzytkownika.Admin)
                         {
                             <li class="nav-item"><a class="nav-link" asp-page="/Moje/Index">Moje pomysły</a></li>
@@ -36,10 +37,14 @@
                             <li class="nav-item"><a class="nav-link" asp-page="/Nabory/Index">Nabory</a></li>
                         }
                         <li class="nav-item"><a class="nav-link" asp-page="/Publiczne/DoTestowania">Innowacje do testowania</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-page="/Biblioteka/Index">Biblioteka</a></li>
                         @if (rola == RolaUzytkownika.PracownikROPS || rola == RolaUzytkownika.Admin)
                         {
-                            <li class="nav-item"><a class="nav-link" asp-page="/Rops/Weryfikacja">Weryfikacja fiszek</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-page="/Rops/KreatorNaboru">Nowy nabór</a></li>
+                            <li class="nav-item"><a class="nav-link fw-semibold" asp-page="/Rops/Panel">Panel ROPS</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-page="/Rops/Problemy">Problemy</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-page="/Rops/Biblioteka">Biblioteka</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-page="/Rops/Weryfikacja">Fiszki</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-page="/Rops/Ocena">Wnioski</a></li>
                             <li class="nav-item"><a class="nav-link" asp-page="/Rops/PodgladTesterow">Testerzy</a></li>
                         }
                     </ul>

@@ -7,6 +7,11 @@
 <h1>Aktywne nabory</h1>
 <p class="text-muted">Nabory, do których możesz zgłosić swoje pomysły.</p>
 
+@if (TempData["Komunikat"] is string komunikat)
+{
+    <div class="alert alert-warning" role="alert">@komunikat</div>
+}
+
 @if (Model.Nabory.Count == 0)
 {
     <div class="alert alert-info">Brak aktywnych naborów. Zajrzyj później.</div>

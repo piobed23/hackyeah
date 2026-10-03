@@ -1,0 +1,95 @@
+@page
+@model App.Pages.Middleman.DaneModel
+@{
+    ViewData["Title"] = "Middleman — dane instytucji";
+}
+
+<nav aria-label="okruszki" class="mb-2">
+    <a asp-page="/Publiczne/Karta" asp-route-id="@Model.Innowacja.Id" class="small">← Karta innowacji</a>
+</nav>
+
+<h1>Middleman Innowacji</h1>
+<p class="text-muted">Dostosowujemy innowację <strong>„@Model.Innowacja.Karta?.Tytul"</strong> do warunków Twojej instytucji.</p>
+
+<ol class="list-unstyled d-flex gap-2 small flex-wrap mb-4" aria-label="Postęp">
+    <li aria-current="step"><span class="badge bg-primary">Krok 1 z 3: Dane instytucji</span></li>
+    <li><span class="badge bg-light text-dark border">2. Warianty</span></li>
+    <li><span class="badge bg-light text-dark border">3. Karta wdrożenia</span></li>
+</ol>
+
+<form method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <section class="mb-4">
+        <h2 class="h5">Instytucja</h2>
+        <div class="row g-3">
+            <div class="col-md-7">
+                <label asp-for="Karta.NazwaInstytucji" class="form-label">Nazwa instytucji</label>
+                <input asp-for="Karta.NazwaInstytucji" class="form-control" required maxlength="200" />
+            </div>
+            <div class="col-md-5">
+                <label asp-for="Karta.TypInstytucji" class="form-label">Typ</label>
+                <select asp-for="Karta.TypInstytucji" class="form-select">
+                    <option value="">— wybierz —</option>
+                    <option>Gmina</option>
+                    <option>Powiat</option>
+                    <option>Centrum Usług Społecznych</option>
+                    <option>OPS</option>
+                    <option>Organizacja pozarządowa (NGO)</option>
+                    <option>Placówka edukacyjna</option>
+                    <option>Instytucja pomocy społecznej</option>
+                    <option>Inna</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Karta.Lokalizacja" class="form-label">Lokalizacja / obszar działania</label>
+                <input asp-for="Karta.Lokalizacja" class="form-control" maxlength="200" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Karta.LiczbaOdbiorcow" class="form-label">Planowana liczba odbiorców</label>
+                <input asp-for="Karta.LiczbaOdbiorcow" type="number" min="0" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Karta.Budzet" class="form-label">Orientacyjny budżet (PLN)</label>
+                <input asp-for="Karta.Budzet" type="number" step="500" min="0" class="form-control" />
+            </div>
+        </div>
+    </section>
+
+    <section class="mb-4">
+        <h2 class="h5">Potrzeby i kontekst</h2>
+        <div class="row g-3">
+            <div class="col-12">
+                <label asp-for="Karta.OpisPotrzeby" class="form-label">Jaką potrzebę chcecie zaspokoić? (uzupełnij własnymi słowami)</label>
+                <textarea asp-for="Karta.OpisPotrzeby" class="form-control" rows="3" maxlength="2000" aria-describedby="h-pn"></textarea>
+                <div id="h-pn" class="form-text">Jak problem opisany w innowacji wygląda u Was? Co jest specyficzne dla Waszej grupy?</div>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Karta.DostepnyPersonel" class="form-label">Dostępny personel</label>
+                <textarea asp-for="Karta.DostepnyPersonel" class="form-control" rows="3" maxlength="1000" placeholder="np. 1 koordynator, 5 wolontariuszy, pedagog"></textarea>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Karta.Zasoby" class="form-label">Posiadane zasoby</label>
+                <textarea asp-for="Karta.Zasoby" class="form-control" rows="3" maxlength="1000" placeholder="np. sala w CUS, komputery, dostęp do grupy odbiorców"></textarea>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Karta.PotrzebyDostepnosci" class="form-label">Potrzeby dostępności</label>
+                <textarea asp-for="Karta.PotrzebyDostepnosci" class="form-control" rows="2" maxlength="1000" placeholder="np. transport, tłumacz PJM, obsługa telefoniczna"></textarea>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Karta.Ograniczenia" class="form-label">Ograniczenia</label>
+                <textarea asp-for="Karta.Ograniczenia" class="form-control" rows="2" maxlength="1000" placeholder="np. tereny wiejskie, słaby zasięg, sezonowość"></textarea>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Karta.PlanowanyStart" class="form-label">Planowany start</label>
+                <input asp-for="Karta.PlanowanyStart" type="date" class="form-control" />
+            </div>
+        </div>
+    </section>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Zapisz i wygeneruj warianty</button>
+        <a class="btn btn-outline-secondary" asp-page="/Publiczne/Karta" asp-route-id="@Model.Innowacja.Id">Anuluj</a>
+    </div>
+</form>

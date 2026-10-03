@@ -1,0 +1,110 @@
+@page
+@model App.Pages.Middleman.WariantyModel
+@{
+    ViewData["Title"] = "Middleman — warianty";
+}
+
+<nav aria-label="okruszki" class="mb-2">
+    <a asp-page="/Middleman/Dane" asp-route-id="@Model.Id" class="small">← Dane instytucji</a>
+</nav>
+
+<h1>Trzy warianty wdrożenia</h1>
+<p class="text-muted">Innowacja: <strong>„@Model.Innowacja.Karta?.Tytul"</strong> · Instytucja: <strong>@Model.Karta.NazwaInstytucji</strong></p>
+
+<ol class="list-unstyled d-flex gap-2 small flex-wrap mb-4" aria-label="Postęp">
+    <li><a class="badge bg-success text-decoration-none" asp-page="/Middleman/Dane" asp-route-id="@Model.Id">1. Dane</a></li>
+    <li aria-current="step"><span class="badge bg-primary">Krok 2 z 3: Warianty</span></li>
+    <li><span class="badge bg-light text-dark border">3. Karta wdrożenia</span></li>
+</ol>
+
+<section class="row g-3 my-3" aria-labelledby="an">
+    <div class="col-md-6">
+        <div class="card border-success h-100">
+            <div class="card-body">
+                <h2 id="an" class="h6 text-success">✓ Dostępne u Was</h2>
+                @if (Model.Analiza.Dostepne.Count == 0)
+                {
+                    <p class="small text-muted mb-0">Nie zidentyfikowano konkretnych zasobów — uzupełnij dane w kroku 1.</p>
+                }
+                else
+                {
+                    <ul class="small mb-0">
+                        @foreach (var d in Model.Analiza.Dostepne) { <li>@d</li> }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card border-warning h-100">
+            <div class="card-body">
+                <h2 class="h6 text-warning">! Brakuje / do uzupełnienia</h2>
+                @if (Model.Analiza.Brakuje.Count == 0)
+                {
+                    <p class="small text-muted mb-0">Nie wykryto krytycznych braków.</p>
+                }
+                else
+                {
+                    <ul class="small mb-0">
+                        @foreach (var b in Model.Analiza.Brakuje) { <li>@b</li> }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row g-3 my-4" aria-labelledby="war">
+    <h2 id="war" class="h5 mb-0">Warianty do wyboru</h2>
+
+    @foreach (var w in Model.Warianty)
+    {
+        var klasa = w.Typ switch
+        {
+            App.Infrastructure.Enums.WariantWdrozenia.Minimalny => "border-secondary",
+            App.Infrastructure.Enums.WariantWdrozenia.Rekomendowany => "border-primary",
+            App.Infrastructure.Enums.WariantWdrozenia.Rozszerzony => "border-info",
+            _ => ""
+        };
+        var oznaczenie = w.Typ == App.Infrastructure.Enums.WariantWdrozenia.Rekomendowany ? "⭐ Rekomendowany" : w.Typ.ToString();
+        <div class="col-md-4">
+            <article class="card h-100 @klasa">
+                <div class="card-header">
+                    <strong>@oznaczenie</strong>
+                    <div class="small text-muted">@w.Nazwa</div>
+                </div>
+                <div class="card-body">
+                    <dl class="small">
+                        <dt>Odbiorcy</dt><dd>@w.LiczbaOdbiorcow osób</dd>
+                        <dt>Zespół</dt><dd>@w.Zespol</dd>
+                        <dt>Czas</dt><dd>@w.Czas</dd>
+                        <dt>Szac. koszt</dt><dd><strong>@w.Koszt.ToString("C")</strong></dd>
+                    </dl>
+
+                    <h3 class="h6 mt-3">Kluczowe elementy</h3>
+                    <ul class="small">
+                        @foreach (var el in w.KluczoweElementy) { <li>@el</li> }
+                    </ul>
+
+                    <h3 class="h6">Zalety</h3>
+                    <ul class="small text-success">
+                        @foreach (var z in w.Zalety) { <li>@z</li> }
+                    </ul>
+
+                    <h3 class="h6">Ryzyka</h3>
+                    <ul class="small text-warning">
+                        @foreach (var r in w.Ryzyka) { <li>@r</li> }
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <form method="post" asp-page-handler="Wybierz">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="wariant" value="@w.Typ" />
+                        <button type="submit" class="btn btn-primary w-100">Wybierz ten wariant</button>
+                    </form>
+                </div>
+            </article>
+        </div>
+    }
+</section>

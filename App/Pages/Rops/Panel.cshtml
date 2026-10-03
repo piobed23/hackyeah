@@ -1,0 +1,136 @@
+@page
+@model App.Pages.Rops.PanelModel
+@{
+    ViewData["Title"] = "Panel ROPS";
+}
+
+<h1>Panel administratora ROPS</h1>
+<p class="text-muted">Przegląd kolejek i ostatnich zmian w systemie.</p>
+
+<section class="row g-3 my-3" aria-label="Kolejki">
+    <div class="col-md-3 col-6">
+        <a class="card text-decoration-none h-100 @(Model.ProblemyNowe > 0 ? "border-warning" : "")" asp-page="/Rops/Problemy">
+            <div class="card-body">
+                <p class="h3 mb-0">@Model.ProblemyNowe</p>
+                <p class="small text-muted mb-0">nowych problemów</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6">
+        <a class="card text-decoration-none h-100 @(Model.ProblemyLuki > 0 ? "border-danger" : "")" asp-page="/Rops/Problemy">
+            <div class="card-body">
+                <p class="h3 mb-0">@Model.ProblemyLuki</p>
+                <p class="small text-muted mb-0">zidentyfikowanych luk</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6">
+        <a class="card text-decoration-none h-100 @(Model.FiszkiDoWeryfikacji > 0 ? "border-warning" : "")" asp-page="/Rops/Weryfikacja">
+            <div class="card-body">
+                <p class="h3 mb-0">@Model.FiszkiDoWeryfikacji</p>
+                <p class="small text-muted mb-0">fiszek do weryfikacji</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6">
+        <a class="card text-decoration-none h-100 @(Model.WnioskiDoOceny > 0 ? "border-warning" : "")" asp-page="/Rops/Ocena">
+            <div class="card-body">
+                <p class="h3 mb-0">@Model.WnioskiDoOceny</p>
+                <p class="small text-muted mb-0">wniosków do oceny</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6">
+        <a class="card text-decoration-none h-100" asp-page="/Nabory/Index">
+            <div class="card-body">
+                <p class="h3 mb-0">@Model.Nabory</p>
+                <p class="small text-muted mb-0">aktywnych naborów</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6">
+        <a class="card text-decoration-none h-100 @(Model.SesjeDoZatwierdzenia > 0 ? "border-success" : "")" asp-page="/Rops/PodgladTesterow">
+            <div class="card-body">
+                <p class="h3 mb-0">@Model.SesjeDoZatwierdzenia / @Model.SesjeTestowe</p>
+                <p class="small text-muted mb-0">sesje testowe do zatwierdzenia / wszystkie trwające</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6">
+        <a class="card text-decoration-none h-100 @(Model.BibliotekaKolejka > 0 ? "border-warning" : "")" asp-page="/Rops/Biblioteka">
+            <div class="card-body">
+                <p class="h3 mb-0">@Model.BibliotekaKolejka</p>
+                <p class="small text-muted mb-0">materiałów do weryfikacji</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6">
+        <a class="card text-decoration-none h-100 @(Model.PropozycjeZmianBiblioteka > 0 ? "border-warning" : "")" asp-page="/Rops/Biblioteka">
+            <div class="card-body">
+                <p class="h3 mb-0">@Model.PropozycjeZmianBiblioteka</p>
+                <p class="small text-muted mb-0">propozycji zmian w Bibliotece</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6">
+        <a class="card text-decoration-none h-100" asp-page="/Biblioteka/Index">
+            <div class="card-body">
+                <p class="h3 mb-0">@Model.BibliotekaOpublikowana</p>
+                <p class="small text-muted mb-0">opublikowanych materiałów</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <p class="h3 mb-0">@Model.InnowacjeSprawdzone</p>
+                <p class="small text-muted mb-0">sprawdzonych innowacji</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row g-3 my-4">
+    <div class="col-lg-6">
+        <h2 class="h5">Najczęstsze tagi w problemach mieszkańców</h2>
+        @if (Model.TopTagi.Count == 0)
+        {
+            <p class="text-muted">Brak zgłoszeń.</p>
+        }
+        else
+        {
+            <ul class="list-group">
+            @foreach (var (tag, liczba) in Model.TopTagi)
+            {
+                <li class="list-group-item d-flex justify-content-between">
+                    <span>@tag</span>
+                    <span class="badge bg-primary">@liczba</span>
+                </li>
+            }
+            </ul>
+            <p class="small text-muted mt-2">Wysoki licznik może oznaczać lukę społeczną.</p>
+        }
+    </div>
+
+    <div class="col-lg-6">
+        <h2 class="h5">Ostatnie 30 zdarzeń (change log)</h2>
+        <ol class="list-unstyled small" style="max-height: 400px; overflow-y: auto;">
+        @foreach (var h in Model.Historia)
+        {
+            <li class="border-start border-2 border-info ps-2 mb-2">
+                <strong>@h.Akcja</strong> na @h.EncjaTyp#@h.EncjaId
+                <br />
+                <span class="text-muted">
+                    @h.KiedyUtc.ToLocalTime():yyyy-MM-dd HH:mm
+                    @if (h.Uzytkownik is not null) { <span> · @h.Uzytkownik.Imie @h.Uzytkownik.Nazwisko (@h.Uzytkownik.Rola)</span> }
+                </span>
+                @if (!string.IsNullOrWhiteSpace(h.MetaJson))
+                {
+                    <br />
+                    <code class="small">@h.MetaJson</code>
+                }
+            </li>
+        }
+        </ol>
+    </div>
+</section>

@@ -40,6 +40,45 @@
     }
 </div>
 
+@if (Model.PytaniaOdInstytucji.Count > 0)
+{
+    <section class="my-4" aria-labelledby="pyt">
+        <h2 id="pyt" class="h5">Pytania od instytucji wdrażających (@Model.PytaniaOdInstytucji.Count)</h2>
+        @foreach (var kw in Model.PytaniaOdInstytucji)
+        {
+            <article class="card my-2">
+                <div class="card-body">
+                    <p class="small text-muted mb-1">
+                        <strong>@kw.NazwaInstytucji</strong> (@kw.TypInstytucji)
+                        @if (!string.IsNullOrEmpty(kw.Lokalizacja)) { <span>· @kw.Lokalizacja</span> }
+                        · @kw.PytanieWyslaneUtc?.ToLocalTime():yyyy-MM-dd HH:mm
+                    </p>
+                    <p class="small text-muted">Wybrany wariant: @kw.WybranyWariant</p>
+                    <p><strong>Pytanie:</strong> @kw.PytanieDoAutora</p>
+                    @if (!string.IsNullOrEmpty(kw.OdpowiedzAutora))
+                    {
+                        <div class="alert alert-success py-2 small mb-0">
+                            <strong>Twoja odpowiedź (@kw.OdpowiedzUtc?.ToLocalTime():yyyy-MM-dd HH:mm):</strong>
+                            <p class="mb-0">@kw.OdpowiedzAutora</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <form method="post" asp-page-handler="Odpowiedz">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="Id" />
+                            <input type="hidden" name="KartaWdrozeniaId" value="@kw.Id" />
+                            <label for="odp-@kw.Id" class="form-label">Twoja odpowiedź</label>
+                            <textarea id="odp-@kw.Id" name="Odpowiedz" class="form-control" rows="3" required maxlength="4000"></textarea>
+                            <button type="submit" class="btn btn-sm btn-primary mt-2">Wyślij odpowiedź</button>
+                        </form>
+                    }
+                </div>
+            </article>
+        }
+    </section>
+}
+
 @if (mozeRozpoczacTest)
 {
     <section class="collapse mt-4" id="rozpocznijTest">

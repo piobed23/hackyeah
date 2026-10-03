@@ -25,6 +25,9 @@ public class AppDbContext : DbContext
     public DbSet<TestSession> TestSessions => Set<TestSession>();
     public DbSet<TesterApplication> TesterApplications => Set<TesterApplication>();
     public DbSet<TesterFeedback> TesterFeedbacks => Set<TesterFeedback>();
+    public DbSet<ImplementationCard> ImplementationCards => Set<ImplementationCard>();
+    public DbSet<LibraryItem> LibraryItems => Set<LibraryItem>();
+    public DbSet<LibraryItemChangeProposal> LibraryItemChangeProposals => Set<LibraryItemChangeProposal>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -126,5 +129,25 @@ public class AppDbContext : DbContext
         b.Entity<BudgetItem>().Property(x => x.WkladWlasny).HasConversion<double>();
         b.Entity<Application>().Property(a => a.WnioskowanaKwotaGrantu).HasConversion<double>();
         b.Entity<ScheduleItem>().Property(s => s.KosztDzialania).HasConversion<double>();
+
+        b.Entity<ImplementationCard>(e =>
+        {
+            e.HasOne(x => x.Idea).WithMany().HasForeignKey(x => x.IdeaId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(x => x.InstytucjaUser).WithMany().HasForeignKey(x => x.InstytucjaUserId).OnDelete(DeleteBehavior.Restrict);
+            e.Property(x => x.Budzet).HasConversion<double>();
+        });
+
+        b.Entity<LibraryItem>(e =>
+        {
+            e.HasOne(x => x.ZglaszajacyUser).WithMany().HasForeignKey(x => x.ZglaszajacyUserId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(x => x.ZastapionyPrzez).WithMany().HasForeignKey(x => x.ZastapionyPrzezId).OnDelete(DeleteBehavior.SetNull);
+            e.HasOne(x => x.DuplikatOf).WithMany().HasForeignKey(x => x.DuplikatOfId).OnDelete(DeleteBehavior.SetNull);
+        });
+
+        b.Entity<LibraryItemChangeProposal>(e =>
+        {
+            e.HasOne(x => x.LibraryItem).WithMany(l => l.PropozycjeZmian).HasForeignKey(x => x.LibraryItemId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(x => x.ProponujacyUser).WithMany().HasForeignKey(x => x.ProponujacyUserId).OnDelete(DeleteBehavior.Restrict);
+        });
     }
 }

@@ -60,6 +60,21 @@
         </span>
     </div>
 
+    @if (i.EtapInnowacji == EtapInnowacji.SprawdzonaInnowacja)
+    {
+        <div class="alert alert-primary mt-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <div>
+                <strong>Sprawdzona innowacja.</strong>
+                Możesz ją dostosować do swojej instytucji (gmina, CUS, NGO, szkoła…) przez <em>Middlemana Innowacji</em>.
+            </div>
+            <form method="post" asp-page="/Middleman/Start">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ideaId" value="@Model.Id" />
+                <button type="submit" class="btn btn-primary">Dostosuj do naszej instytucji</button>
+            </form>
+        </div>
+    }
+
     @if (Model.AktywnaSesjaTestowa is not null)
     {
         <div class="alert alert-warning mt-3" aria-labelledby="szukaTest">

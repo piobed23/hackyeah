@@ -71,6 +71,66 @@ public class InMemorySimilaritySearch : ISimilaritySearch
         return wyniki.OrderByDescending(w => w.Wynik).Take(topN).ToList();
     }
 
+    public async Task<IReadOnlyList<SimilarityResult>> ZnajdzDlaProblemuAsync(ProblemReport problem, int topN = 5)
+    {
+        var tekstKand = Normalizuj($"{problem.Tytul} {problem.Opis} {problem.KogoDotyczy} {problem.OczekiwanyEfekt}");
+        var tokenyKand = Tokenizuj(tekstKand);
+        var tagiKand = RozbijTagi(problem.Tagi);
+
+        var innowacje = await _db.Ideas
+            .Include(i => i.Karta)
+            .Where(i => i.Karta != null
+                && (i.Karta.Status == StatusFiszki.Opublikowany
+                    || i.Karta.Status == StatusFiszki.Zaakceptowany))
+            .ToListAsync();
+
+        var wyniki = new List<SimilarityResult>();
+        foreach (var i in innowacje)
+        {
+            var k = i.Karta!;
+            var tekstInnowacji = Normalizuj($"{k.Tytul} {k.Streszczenie} {k.Problem} {k.Rozwiazanie} {k.GrupaDocelowa}");
+            var tokenyInnowacji = Tokenizuj(tekstInnowacji);
+            var tagiInnowacji = RozbijTagi(k.Tagi);
+
+            var fts = PodobienstwoTokenow(tokenyKand, tokenyInnowacji);
+            var tagi = Jaccard(tagiKand, tagiInnowacji);
+            var wynik = 0.70 * fts + 0.30 * tagi;
+            if (wynik < 0.05) continue;
+
+            var kategoria = i.EtapInnowacji switch
+            {
+                EtapInnowacji.SprawdzonaInnowacja => KategoriaPodobienstwa.SprawdzonaInnowacja,
+                EtapInnowacji.WRealizacji or EtapInnowacji.WTestach or EtapInnowacji.PoszukujeTesterow
+                    or EtapInnowacji.WPrzygotowaniu or EtapInnowacji.FinansowaniePrzyznane
+                    or EtapInnowacji.TestyZakonczone => KategoriaPodobienstwa.PodobnyPomysl,
+                _ => KategoriaPodobienstwa.PodobnyPomysl
+            };
+
+            wyniki.Add(new SimilarityResult(i.Id, k.Tytul, k.Streszczenie, wynik, kategoria, i.Rodzaj, i.EtapInnowacji, tagiKand.Intersect(tagiInnowacji).ToList()));
+        }
+
+        return wyniki.OrderByDescending(w => w.Wynik).Take(topN).ToList();
+    }
+
+    public async Task<IReadOnlyList<ProblemReport>> ZnajdzPodobneProblemyAsync(ProblemReport problem, int topN = 5)
+    {
+        var tekstKand = Normalizuj($"{problem.Tytul} {problem.Opis}");
+        var tokenyKand = Tokenizuj(tekstKand);
+        var tagiKand = RozbijTagi(problem.Tagi);
+
+        var inne = await _db.ProblemReports.Where(p => p.Id != problem.Id).ToListAsync();
+        var wyniki = new List<(ProblemReport p, double w)>();
+        foreach (var p in inne)
+        {
+            var tekstP = Normalizuj($"{p.Tytul} {p.Opis}");
+            var fts = PodobienstwoTokenow(tokenyKand, Tokenizuj(tekstP));
+            var tagi = Jaccard(tagiKand, RozbijTagi(p.Tagi));
+            var w = 0.70 * fts + 0.30 * tagi;
+            if (w > 0.1) wyniki.Add((p, w));
+        }
+        return wyniki.OrderByDescending(x => x.w).Take(topN).Select(x => x.p).ToList();
+    }
+
     private static string Normalizuj(string? s)
     {
         s = (s ?? "").ToLowerInvariant();

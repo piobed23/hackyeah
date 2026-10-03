@@ -1,0 +1,129 @@
+@page
+@model App.Pages.Rops.BibliotekaModel
+@{
+    ViewData["Title"] = "Biblioteka — panel ROPS";
+}
+
+<h1>Biblioteka — panel ROPS</h1>
+
+<section class="my-4" aria-labelledby="k">
+    <h2 id="k" class="h5">Kolejka weryfikacji (@Model.Kolejka.Count)</h2>
+    @if (Model.Kolejka.Count == 0) { <p class="text-muted">Brak zgłoszeń.</p> }
+    else
+    {
+        @foreach (var m in Model.Kolejka)
+        {
+            <article class="card my-2">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between flex-wrap">
+                        <div>
+                            <h3 class="h6 mb-1">@m.Tytul
+                                <span class="badge bg-light text-dark border ms-1">@App.Pages.Biblioteka.IndexModel.NazwaTypu(m.Typ)</span>
+                                <span class="badge bg-info text-dark ms-1">@m.Status</span>
+                            </h3>
+                            <p class="small text-muted mb-1">
+                                Zgłaszający: @m.ZglaszajacyUser.Imie @m.ZglaszajacyUser.Nazwisko
+                                · @m.AktualizowanoUtc.ToLocalTime():yyyy-MM-dd
+                                @if (m.PotwierdzeniePraw) { <span class="text-success">✓ prawa potwierdzone</span> }
+                            </p>
+                            <p class="mb-1">@m.KrotkiOpis</p>
+                            @if (!string.IsNullOrWhiteSpace(m.Link)) { <p class="small"><a href="@m.Link" target="_blank" rel="noopener">@m.Link</a></p> }
+                        </div>
+                        <a class="btn btn-sm btn-outline-secondary" asp-page="/Biblioteka/Szczegoly" asp-route-id="@m.Id">Pełny podgląd</a>
+                    </div>
+
+                    <form method="post" asp-page-handler="Decyzja" class="row g-2 mt-2">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@m.Id" />
+                        <div class="col-md-3">
+                            <label for="a-@m.Id" class="form-label">Decyzja</label>
+                            <select id="a-@m.Id" name="akcja" class="form-select" required>
+                                <option value="Publikuj">Publikuj</option>
+                                <option value="DoPoprawy">Do poprawy</option>
+                                <option value="Odrzuc">Odrzuć</option>
+                                <option value="Archiwizuj">Zarchiwizuj</option>
+                            </select>
+                        </div>
+                        <div class="col-md-7">
+                            <label for="k-@m.Id" class="form-label">Komentarz dla autora</label>
+                            <input id="k-@m.Id" name="komentarz" class="form-control" maxlength="1000" />
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">Zapisz</button>
+                        </div>
+                    </form>
+                </div>
+            </article>
+        }
+    }
+</section>
+
+<section class="my-4" aria-labelledby="pz">
+    <h2 id="pz" class="h5">Propozycje zmian (@Model.PropozycjeZmian.Count)</h2>
+    @if (Model.PropozycjeZmian.Count == 0) { <p class="text-muted">Brak oczekujących propozycji.</p> }
+    else
+    {
+        @foreach (var p in Model.PropozycjeZmian)
+        {
+            <article class="card my-2">
+                <div class="card-body">
+                    <h3 class="h6">Materiał: <a asp-page="/Biblioteka/Szczegoly" asp-route-id="@p.LibraryItemId">@p.LibraryItem.Tytul</a></h3>
+                    <p class="small text-muted">Zaproponował: @p.ProponujacyUser.Imie @p.ProponujacyUser.Nazwisko · @p.UtworzonoUtc.ToLocalTime():yyyy-MM-dd</p>
+                    <p><strong>Uzasadnienie:</strong> @p.Uzasadnienie</p>
+                    <dl class="row small">
+                        @if (!string.IsNullOrWhiteSpace(p.NowyTytul)) { <dt class="col-sm-3">Nowy tytuł</dt><dd class="col-sm-9">@p.NowyTytul</dd> }
+                        @if (!string.IsNullOrWhiteSpace(p.NowyKrotkiOpis)) { <dt class="col-sm-3">Nowy krótki opis</dt><dd class="col-sm-9">@p.NowyKrotkiOpis</dd> }
+                        @if (!string.IsNullOrWhiteSpace(p.NoweTagi)) { <dt class="col-sm-3">Nowe tagi</dt><dd class="col-sm-9">@p.NoweTagi</dd> }
+                        @if (!string.IsNullOrWhiteSpace(p.NowyLink)) { <dt class="col-sm-3">Nowy link</dt><dd class="col-sm-9">@p.NowyLink</dd> }
+                    </dl>
+                    <div class="d-flex gap-2">
+                        <form method="post" asp-page-handler="AkceptujPropozycje">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="propozycjaId" value="@p.Id" />
+                            <button type="submit" class="btn btn-sm btn-success">Zastosuj zmianę</button>
+                        </form>
+                        <form method="post" asp-page-handler="OdrzucPropozycje">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="propozycjaId" value="@p.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger">Odrzuć</button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+        }
+    }
+</section>
+
+<section class="my-4" aria-labelledby="op">
+    <h2 id="op" class="h5">Ostatnio opublikowane (@Model.Opublikowane.Count)</h2>
+    @if (Model.Opublikowane.Count == 0) { <p class="text-muted">Brak.</p> }
+    else
+    {
+        <ul class="list-group">
+        @foreach (var m in Model.Opublikowane)
+        {
+            <li class="list-group-item d-flex justify-content-between">
+                <span><a asp-page="/Biblioteka/Szczegoly" asp-route-id="@m.Id">@m.Tytul</a></span>
+                <span class="small text-muted">@m.OpublikowanoUtc?.ToLocalTime():yyyy-MM-dd</span>
+            </li>
+        }
+        </ul>
+    }
+</section>
+
+<section class="my-4" aria-labelledby="ar">
+    <h2 id="ar" class="h5">Archiwum (@Model.Archiwum.Count)</h2>
+    @if (Model.Archiwum.Count == 0) { <p class="text-muted">Brak.</p> }
+    else
+    {
+        <ul class="list-group">
+        @foreach (var m in Model.Archiwum)
+        {
+            <li class="list-group-item d-flex justify-content-between">
+                <span>@m.Tytul <span class="badge bg-light text-dark border ms-1">@m.Status</span></span>
+                <span class="small text-muted">@m.AktualizowanoUtc.ToLocalTime():yyyy-MM-dd</span>
+            </li>
+        }
+        </ul>
+    }
+</section>

@@ -32,6 +32,7 @@ public class Program
             opt.AddPolicy("RolaAutor", p => p.RequireRole("Autor", "Admin"));
             opt.AddPolicy("RolaAdmin", p => p.RequireRole("Admin"));
             opt.AddPolicy("RolaEkspert", p => p.RequireRole("Ekspert", "Admin"));
+            opt.AddPolicy("RolaInstytucja", p => p.RequireRole("Instytucja", "Admin"));
         });
 
         builder.Services.AddRazorPages()
@@ -42,6 +43,7 @@ public class Program
                 o.Conventions.AuthorizeFolder("/Wnioski", "RolaAutor");
                 o.Conventions.AuthorizeFolder("/Kreator", "RolaAutor");
                 o.Conventions.AuthorizeFolder("/Moje", "RolaAutor");
+                o.Conventions.AuthorizeFolder("/Middleman", "RolaInstytucja");
                 o.Conventions.AuthorizeFolder("/Admin", "RolaAdmin");
             });
 
