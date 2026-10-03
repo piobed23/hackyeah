@@ -39,6 +39,9 @@ public class ZglosModel : PageModel
         Problem.MieszkaniecId = user.Id;
         Problem.Status = StatusProblemu.Zgloszony;
         Problem.PowiadamiajORozwiazaniu = Powiadamiaj;
+        Problem.Tagi = Problem.Tagi?.Trim() ?? "";
+        Problem.Opis = Problem.Opis.Trim();
+        Problem.Tytul = Problem.Tytul.Trim();
         _db.ProblemReports.Add(Problem);
         _db.AuditLog.Add(new AuditLogEntry
         {

@@ -35,9 +35,10 @@ public class InMemorySimilaritySearch : ISimilaritySearch
 
             var fts = PodobienstwoTokenow(tokenyKandydat, tokenyKand);
             var tagi = Jaccard(tagiKandydat, tagiKand);
-            var rodzaj = i.Rodzaj == (karta.Idea?.Rodzaj ?? default) ? 1.0 : 0.0;
 
-            var wynik = 0.60 * fts + 0.30 * tagi + 0.10 * rodzaj;
+            // Scoring tylko z treści + tagów. Wcześniej dochodziła waga 0.10 za zgodny Rodzaj,
+            // ale to generowało artefakty — każda „Innowacja" wyglądała na 10% podobna do innej Innowacji.
+            var wynik = 0.70 * fts + 0.30 * tagi;
             if (wynik <= 0) continue;
 
             var kategoria = i.EtapInnowacji == EtapInnowacji.SprawdzonaInnowacja

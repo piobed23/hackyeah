@@ -10,7 +10,7 @@
 </p>
 
 <section class="my-4" aria-labelledby="s-luki">
-    <h2 id="s-luki" class="h5">Luki społeczne — zgłoszenia bez znalezionego rozwiązania (@Model.KlasteryLuk.Sum(g => g.Count()))</h2>
+    <h2 id="s-luki" class="h5">Luki społeczne — zgłoszenia bez znalezionego rozwiązania (@Model.KlasteryLuk.Sum(g => g.Problemy.Count))</h2>
     @if (Model.KlasteryLuk.Count == 0)
     {
         <p class="text-muted">Brak zidentyfikowanych luk.</p>
@@ -24,11 +24,15 @@
                     <article class="card border-danger h-100">
                         <div class="card-body">
                             <h3 class="h6">
-                                Klaster „@klaster.Key"
-                                <span class="badge bg-danger ms-1">@klaster.Count() zgłoszeń</span>
+                                @klaster.Nazwa
+                                <span class="badge bg-danger ms-1">@klaster.Problemy.Count zgłoszeń</span>
                             </h3>
+                            @if (klaster.Lokalizacje.Count > 0)
+                            {
+                                <p class="small text-muted mb-2">Lokalizacje: @string.Join(" · ", klaster.Lokalizacje)</p>
+                            }
                             <ul class="small mb-0">
-                                @foreach (var p in klaster.Take(5))
+                                @foreach (var p in klaster.Problemy.Take(5))
                                 {
                                     <li>
                                         <strong>@p.Tytul</strong>
@@ -37,7 +41,7 @@
                                         <span class="small text-muted">@p.UtworzonoUtc.ToLocalTime().ToString("yyyy-MM-dd")</span>
                                     </li>
                                 }
-                                @if (klaster.Count() > 5) { <li class="text-muted">i @(klaster.Count() - 5) kolejnych…</li> }
+                                @if (klaster.Problemy.Count > 5) { <li class="text-muted">i @(klaster.Problemy.Count - 5) kolejnych…</li> }
                             </ul>
                         </div>
                     </article>
@@ -45,7 +49,7 @@
             }
         </div>
         <p class="small text-muted mt-2">
-            Klastry wygenerowane po głównym tagu zgłoszenia. Rozważ zaproszenie autora do zaproponowania innowacji.
+            Klastrowanie przez porównanie tytułów i opisów (Jaccard ≥ 30% wspólnych słów ≥ 4 znaków, bez stopwordów). Rozważ zaproszenie autora do zaproponowania innowacji.
         </p>
     }
 </section>

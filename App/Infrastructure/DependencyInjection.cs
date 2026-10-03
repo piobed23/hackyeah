@@ -16,7 +16,10 @@ public static class DependencyInjection
         services.AddSingleton<IAiAssistant, MockAiAssistant>();
         services.AddSingleton<ICompletenessChecker<IdeaCard>, IdeaCardCompletenessChecker>();
         services.AddSingleton<ICompletenessChecker<Application>, ApplicationCompletenessChecker>();
-        services.AddScoped<ISimilaritySearch, InMemorySimilaritySearch>();
+        services.AddSingleton<IEmbeddingService, OnnxE5EmbeddingService>();
+        services.AddSingleton<EmbeddingCache>();
+        services.AddScoped<InMemorySimilaritySearch>();
+        services.AddScoped<ISimilaritySearch, EmbeddingSimilaritySearch>();
         services.AddSingleton<IMiddlemanService, MockMiddlemanService>();
         return services;
     }

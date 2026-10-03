@@ -6,6 +6,7 @@ using App.Models;
 using App.Services.Ai;
 using App.Services.Completeness;
 using App.Services.Context;
+using App.Services.Similarity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -31,13 +32,19 @@ public class KrokModel : PageModel
     private readonly IAuthContext _auth;
     private readonly IAiAssistant _ai;
     private readonly ICompletenessChecker<IdeaCard> _checker;
+    private readonly ISimilaritySearch _search;
+    private readonly IEmbeddingService _embed;
 
-    public KrokModel(AppDbContext db, IAuthContext auth, IAiAssistant ai, ICompletenessChecker<IdeaCard> checker)
+    public KrokModel(
+        AppDbContext db, IAuthContext auth, IAiAssistant ai,
+        ICompletenessChecker<IdeaCard> checker, ISimilaritySearch search, IEmbeddingService embed)
     {
         _db = db;
         _auth = auth;
         _ai = ai;
         _checker = checker;
+        _search = search;
+        _embed = embed;
     }
 
     public Idea Idea { get; private set; } = null!;
@@ -47,6 +54,8 @@ public class KrokModel : PageModel
     [BindProperty(SupportsGet = true)] public int Krok { get; set; } = 1;
 
     public AiSuggestion? Sugestia { get; private set; }
+    public IReadOnlyList<SimilarityResult> Inspiracje { get; private set; } = Array.Empty<SimilarityResult>();
+    public bool UzywaEmbeddingow => _embed.IsAvailable;
     public CompletenessResult? Kompletnosc { get; private set; }
     public string? KomunikatZapisu { get; private set; }
 
@@ -61,6 +70,12 @@ public class KrokModel : PageModel
     public async Task<IActionResult> OnPostAsync(string akcja)
     {
         if (!await WczytajAsync(dolaczBinding: true)) return NotFound();
+
+        // Navigation properties nie są w formularzu — usuń je z ModelState
+        ModelState.Remove("Karta.Idea");
+        ModelState.Remove("Karta.Autor");
+        foreach (var k in ModelState.Keys.Where(k => k.StartsWith("Karta.") && k.EndsWith(".Idea")).ToList())
+            ModelState.Remove(k);
 
         var walidator = new IdeaCardValidator();
         var wynik = await walidator.ValidateAsync(Karta);
@@ -185,5 +200,27 @@ public class KrokModel : PageModel
             7 => await _ai.SummarizeNeedsAsync(Karta),
             _ => null
         };
+
+        // Retrieval z biblioteki — pokazuje realne innowacje podobne do tego, co autor pisze.
+        // Wymaga co najmniej 20 znaków sensownego kontekstu, inaczej algorytm zwraca szum.
+        var kontekst = $"{Karta.Tytul} {Karta.Streszczenie} {Karta.Problem} {Karta.Rozwiazanie}".Trim();
+        if (kontekst.Length >= 20)
+        {
+            try
+            {
+                // Próg prezentacji: dla fallbacku tokenowego 0.25, dla embeddingów 0.55
+                // (embeddingi dają wyższe wartości dla rzeczywistych dopasowań)
+                var minWynik = _embed.IsAvailable ? 0.55f : 0.25f;
+                var surowe = await _search.ZnajdzPodobneAsync(Karta, topN: 10);
+                Inspiracje = surowe
+                    .Where(s => s.Wynik >= minWynik)
+                    .GroupBy(s => s.Tytul.Trim().ToLowerInvariant())
+                    .Select(g => g.OrderByDescending(x => x.Wynik).First())
+                    .OrderByDescending(x => x.Wynik)
+                    .Take(3)
+                    .ToList();
+            }
+            catch { Inspiracje = Array.Empty<SimilarityResult>(); }
+        }
     }
 }
